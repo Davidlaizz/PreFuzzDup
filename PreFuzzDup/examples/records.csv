@@ -1,0 +1,5 @@
+id,type,tag_hex
+r1,image,0000
+r2,image,0001
+r3,image,00f0
+r4,text,ffff

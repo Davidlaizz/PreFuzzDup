@@ -1,0 +1,25 @@
+cmake_minimum_required(VERSION 3.22)
+project(FuzzyDedup LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+set(PBC_ROOT "" CACHE PATH "PBC installation prefix")
+set(GMP_ROOT "" CACHE PATH "GMP installation prefix")
+set(OPENSSL_ROOT_DIR "" CACHE PATH "OpenSSL installation prefix")
+find_package(OpenSSL 3.0 REQUIRED COMPONENTS Crypto)
+find_package(SQLite3 REQUIRED)
+find_path(PBC_INCLUDE_DIR pbc/pbc.h HINTS "${PBC_ROOT}/include" REQUIRED)
+find_library(PBC_LIBRARY pbc HINTS "${PBC_ROOT}/lib" REQUIRED)
+find_path(GMP_INCLUDE_DIR gmp.h HINTS "${GMP_ROOT}/include" REQUIRED)
+find_library(GMP_LIBRARY gmp HINTS "${GMP_ROOT}/lib" REQUIRED)
+
+add_executable(fuzzydedup src/main.cpp)
+target_include_directories(fuzzydedup PRIVATE "${PBC_INCLUDE_DIR}" "${GMP_INCLUDE_DIR}")
+target_link_libraries(fuzzydedup PRIVATE OpenSSL::Crypto SQLite::SQLite3 "${PBC_LIBRARY}" "${GMP_LIBRARY}")
+target_compile_options(fuzzydedup PRIVATE -O3 -Wall -Wextra -Wpedantic)
+
+add_executable(fuzzydedup_lookup_benchmark src/lookup_benchmark.cpp)
+target_link_libraries(fuzzydedup_lookup_benchmark PRIVATE SQLite::SQLite3)
+target_compile_options(fuzzydedup_lookup_benchmark PRIVATE -O3 -Wall -Wextra -Wpedantic)

@@ -1,0 +1,27 @@
+# CMake build output
+build/
+build-check/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+
+# Archive and operating-system metadata
+__MACOSX/
+._*
+.DS_Store
+Thumbs.db
+
+# Runtime databases, ciphertext and local experiment output
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+blobs/
+runtime/
+results-local/
+
+# Keep example CSV files and CMakeLists.txt versioned.
