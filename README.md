@@ -14,6 +14,8 @@
 
 每个项目包含 `src/`、`CMakeLists.txt` 和使用说明。`PreFuzzDup/examples/` 提供小型 CSV 标签示例。两个对比项目中的 `prefuzzdup_core.cpp` 是保证独立构建所需的本地副本。
 
+详细执行流程、数据库表结构与实验比较口径见[三套方案的代码逻辑与数据库说明](docs/logic-and-databases.md)。
+
 ## 依赖与环境
 
 - 公共依赖：CMake 3.22+、支持 C++20 的 GCC/Clang、OpenSSL 3 和 SQLite3 开发包。
