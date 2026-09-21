@@ -1,0 +1,25 @@
+{
+  "description": "Local evidence hashes; raw data and logs are not distributed with Git.",
+  "files": [
+    {
+      "path": "results-local/enron-5w/lookup-experiment/summary.csv",
+      "sha256": "7c680b5ae075a1baed39f8cdc7f3373ff7d13854709a93101ab1d21e9cc63ea1"
+    },
+    {
+      "path": "results-local/enron-5w/lookup-experiment/run_manifest.json",
+      "sha256": "34099e624bb0c7b0ad9478c1ffd020cfd5b0e28c8aa622fd8182b249843bd636"
+    },
+    {
+      "path": "results-local/enron-full/lookup-experiment/summary.csv",
+      "sha256": "50c940fc1ef17d95122e66f1232136fa1f7b0f76b9c5137011f6d70652f13a54"
+    },
+    {
+      "path": "results-local/enron-full/lookup-experiment/run_manifest.json",
+      "sha256": "bb16e31021e0e1615b0f5a9bb39a5c1c0760a48bc3b478344e654eca20acf8a0"
+    },
+    {
+      "path": "results-local/enron-full/lookup-experiment/inputs/split_summary.json",
+      "sha256": "908117ea0e66225fc39f3ed7bc558bc654e5436d7441bbfb09b553bd10276ff9"
+    }
+  ]
+}

@@ -16,6 +16,8 @@
 
 详细执行流程、数据库表结构与实验比较口径见[三套方案的代码逻辑与数据库说明](docs/logic-and-databases.md)。
 
+Enron 实验入口：[运行工具](tools/README.md)、[数据准备历史](docs/enron-dataset-history.md)、[检索结果](docs/enron-lookup-results.md)、[复杂度分析](docs/algorithm-complexity.md)。
+
 ## 依赖与环境
 
 - 公共依赖：CMake 3.22+、支持 C++20 的 GCC/Clang、OpenSSL 3 和 SQLite3 开发包。
