@@ -52,6 +52,25 @@ python3 tools/enron-full/run_full_lookup_experiment.py
 python3 tools/enron-5w/analyze_similarity.py
 ```
 
+新增工具的单元测试：
+
+```bash
+python3 -m unittest discover -s tools/prefuzzdup-handoff -v
+```
+
+## PreFuzzDup 服务器交接
+
+若要把本地已生成的标签输入交给服务器执行，使用：
+
+```bash
+python3 tools/prefuzzdup-handoff/handoff.py client \
+  --scale 5w \
+  --source results-local/enron-5w/lookup-experiment/inputs \
+  --dest handoff/20260921-prefuzzdup-5w
+```
+
+服务器端执行和分析步骤见 `docs/prefuzzdup-server-handoff.md`。该流程只做离线标签检索交接，不包含网络通信或完整协议。
+
 先完成 5w，再运行全量：全量扩展比较读取当前仓库
 `results-local/enron-5w/lookup-experiment/summary.csv`。
 两个 runner 支持 `--repo`、`--dataset`、`--output`；默认分别写入
