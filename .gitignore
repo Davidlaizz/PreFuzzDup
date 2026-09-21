@@ -13,6 +13,11 @@ __MACOSX/
 .DS_Store
 Thumbs.db
 
+# Enron raw corpus and downloaded archives
+/enron_mail_20150507/
+/enron_mail_20150507.tar.gz
+/enron_mail_20150507.tar
+
 # Runtime databases, ciphertext and local experiment output
 *.sqlite
 *.sqlite-*
