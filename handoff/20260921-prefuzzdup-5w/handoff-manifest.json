@@ -1,0 +1,81 @@
+{
+  "created_utc": "2026-09-21T15:53:51.933046+00:00",
+  "expected_outputs": [
+    "results/prefuzz_verify.csv",
+    "results/prefuzz_t4.csv",
+    "results/prefuzz_t5.csv",
+    "results/prefuzz_t6.csv"
+  ],
+  "expected_rows_per_threshold": 3000,
+  "expected_verify_rows": 100,
+  "fpp": "0.01",
+  "inputs": {
+    "queries_bench_1000.csv": {
+      "sha256": "35d89630fbebef2279bd7340af3568b246884204e39ee06ce225866056b850bc",
+      "size_bytes": 83016
+    },
+    "queries_verify_100.csv": {
+      "sha256": "69b9bfa924e2b9e764110fc9022d19f615195b106f1869afe34d2b955a93b637",
+      "size_bytes": 8316
+    },
+    "reference.csv": {
+      "sha256": "c55c0e6b2306ef042864fef17a0ae73e7e5c8fbd5cd09797b20b4a2cfdc4c2c2",
+      "size_bytes": 3435552
+    },
+    "split_summary.json": {
+      "sha256": "b0689a2cef0eb813cb8b6ca39c5026dc3c6cfa56add2c690b3dac02e114081ec",
+      "size_bytes": 1023
+    }
+  },
+  "package_type": "prefuzzdup_lookup_handoff",
+  "repeat": 3,
+  "scale": "5w",
+  "schema_version": 1,
+  "source_experiment": "results-local/enron-5w/lookup-experiment/inputs",
+  "source_git_commit": "fc2f9d3f364ad5c788d30f8eb502d5fe64cc8779",
+  "split_summary": {
+    "benchmark_count": 1000,
+    "benchmark_groups": {
+      "exact_ref": 162,
+      "no_exact_ref": 838
+    },
+    "files": {
+      "queries_bench_1000.csv": {
+        "sha256": "35d89630fbebef2279bd7340af3568b246884204e39ee06ce225866056b850bc",
+        "size_bytes": 83016
+      },
+      "queries_verify_100.csv": {
+        "sha256": "69b9bfa924e2b9e764110fc9022d19f615195b106f1869afe34d2b955a93b637",
+        "size_bytes": 8316
+      },
+      "query_labels_bench_1000.csv": {
+        "sha256": "19d98ba39c3192f059b2a78b66f3aaf08d8411d12f25c51f4620b0f5b1d3915e",
+        "size_bytes": 103551
+      },
+      "reference.csv": {
+        "sha256": "c55c0e6b2306ef042864fef17a0ae73e7e5c8fbd5cd09797b20b4a2cfdc4c2c2",
+        "size_bytes": 3435552
+      }
+    },
+    "query_pool_count": 10348,
+    "query_pool_groups": {
+      "exact_ref": 1680,
+      "no_exact_ref": 8668
+    },
+    "reference_count": 41392,
+    "sample_seed": 20260922,
+    "split_seed": 20260921,
+    "total_records": 51740,
+    "verify_count": 100,
+    "verify_groups": {
+      "exact_ref": 50,
+      "no_exact_ref": 50
+    }
+  },
+  "tag_bits": 256,
+  "thresholds": [
+    4,
+    5,
+    6
+  ]
+}
