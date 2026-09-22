@@ -1,0 +1,61 @@
+{
+  "benchmark_corpus_duplicate_buckets": {
+    "1": 227,
+    "11_100": 48,
+    "2": 240,
+    "3_10": 484,
+    "over_100": 1
+  },
+  "benchmark_count": 1000,
+  "benchmark_groups": {
+    "exact_ref": 718,
+    "no_exact_ref": 282
+  },
+  "benchmark_reference_duplicate_buckets": {
+    "1": 281,
+    "11_100": 37,
+    "2": 217,
+    "3_10": 183
+  },
+  "benchmark_unique_body_hashes": 999,
+  "corpus_duplicate_buckets": {
+    "1": 115826,
+    "11_100": 1031,
+    "2": 62448,
+    "3_10": 68557,
+    "over_100": 10
+  },
+  "dataset": "enron_full_body_tags_v1",
+  "files": {
+    "queries_bench_1000.csv": {
+      "sha256": "9a5942b347af54d6b6a28739144caaea1898852214f0736dcb634dde869b01d9",
+      "size_bytes": 88016
+    },
+    "queries_verify_100.csv": {
+      "sha256": "357e6ba915cba1f68f74b8d0aa996da88986d8628e2680175403f3aaa1124be3",
+      "size_bytes": 8816
+    },
+    "query_labels_bench_1000.csv": {
+      "sha256": "90a306e63541ae3685f457b7fc017abedb5c69d9ff6e743e3b41d9dff326b4e3",
+      "size_bytes": 111883
+    },
+    "reference.csv": {
+      "sha256": "e72e8674ffd9e5952bc078091c3ab25b72f25b6476f093028738878d9a339854",
+      "size_bytes": 36425064
+    }
+  },
+  "query_pool_count": 103480,
+  "query_pool_groups": {
+    "exact_ref": 74290,
+    "no_exact_ref": 29190
+  },
+  "reference_count": 413921,
+  "sample_seed": 20260922,
+  "split_seed": 20260921,
+  "total_records": 517401,
+  "verify_count": 100,
+  "verify_groups": {
+    "exact_ref": 50,
+    "no_exact_ref": 50
+  }
+}
