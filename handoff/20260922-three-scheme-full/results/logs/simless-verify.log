@@ -1,0 +1,12 @@
+$ /home/user/fl/PreFuzzDup-full/SimLESS/build/simless_lookup_benchmark --scheme simless --records /home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/reference.csv --queries /home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/queries_verify_100.csv --labels /home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/query_groups_verify_100.csv --thresholds 4,5,6 --repeat 1 --db /home/user/three-scheme-full-scratch/simless_verify.sqlite --out /home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/results/simless_verify.csv
+cwd: /home/user/fl/PreFuzzDup-full
+
+[stdout]
+simless threshold=4 group=verify mean_us=27827.5 samples=100
+simless threshold=5 group=verify mean_us=27827.5 samples=100
+simless threshold=6 group=verify mean_us=27827.5 samples=100
+
+[stderr]
+
+[exit-code] 0
+[wall-seconds] 3.387005

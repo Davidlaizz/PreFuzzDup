@@ -1,0 +1,469 @@
+{
+  "commands": [
+    {
+      "command": [
+        "cmake",
+        "-S",
+        "/home/user/fl/PreFuzzDup-full/PreFuzzDup",
+        "-B",
+        "/home/user/fl/PreFuzzDup-full/PreFuzzDup/build",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "exit_code": 0,
+      "log": "20260922-three-scheme-full/results/logs/build-prefuzzdup-configure.log",
+      "phase": "configure_PreFuzzDup",
+      "wall_seconds": 0.05458245799673023
+    },
+    {
+      "command": [
+        "cmake",
+        "--build",
+        "/home/user/fl/PreFuzzDup-full/PreFuzzDup/build",
+        "--target",
+        "prefuzzdup_persistent_lookup",
+        "-j"
+      ],
+      "exit_code": 0,
+      "log": "20260922-three-scheme-full/results/logs/build-prefuzzdup.log",
+      "phase": "build_PreFuzzDup",
+      "wall_seconds": 0.20050250900021638
+    },
+    {
+      "command": [
+        "cmake",
+        "-S",
+        "/home/user/fl/PreFuzzDup-full/SimLESS",
+        "-B",
+        "/home/user/fl/PreFuzzDup-full/SimLESS/build",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "exit_code": 0,
+      "log": "20260922-three-scheme-full/results/logs/build-simless-configure.log",
+      "phase": "configure_SimLESS",
+      "wall_seconds": 0.05945306400099071
+    },
+    {
+      "command": [
+        "cmake",
+        "--build",
+        "/home/user/fl/PreFuzzDup-full/SimLESS/build",
+        "--target",
+        "simless_lookup_benchmark",
+        "-j"
+      ],
+      "exit_code": 0,
+      "log": "20260922-three-scheme-full/results/logs/build-simless.log",
+      "phase": "build_SimLESS",
+      "wall_seconds": 0.21550925100018503
+    },
+    {
+      "command": [
+        "cmake",
+        "-S",
+        "/home/user/fl/PreFuzzDup-full/FuzzyDedup",
+        "-B",
+        "/home/user/fl/PreFuzzDup-full/FuzzyDedup/build",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "exit_code": 0,
+      "log": "20260922-three-scheme-full/results/logs/build-fuzzydedup-configure.log",
+      "phase": "configure_FuzzyDedup",
+      "wall_seconds": 0.062326551000296604
+    },
+    {
+      "command": [
+        "cmake",
+        "--build",
+        "/home/user/fl/PreFuzzDup-full/FuzzyDedup/build",
+        "--target",
+        "fuzzydedup_lookup_benchmark",
+        "-j"
+      ],
+      "exit_code": 0,
+      "log": "20260922-three-scheme-full/results/logs/build-fuzzydedup.log",
+      "phase": "build_FuzzyDedup",
+      "wall_seconds": 0.21155166699827532
+    },
+    {
+      "command": [
+        "/home/user/fl/PreFuzzDup-full/PreFuzzDup/build/prefuzzdup_persistent_lookup",
+        "--records",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/reference.csv",
+        "--queries",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/queries_verify_100.csv",
+        "--db",
+        "/home/user/three-scheme-full-scratch/prefuzzdup_verify.sqlite",
+        "--tag-bits",
+        "256",
+        "--threshold",
+        "default=6",
+        "--fpp",
+        "0.01",
+        "--strategies",
+        "prefuzz",
+        "--repeat",
+        "1",
+        "--verify-equivalence",
+        "--out",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/results/prefuzzdup_verify.csv"
+      ],
+      "exit_code": 0,
+      "log": "20260922-three-scheme-full/results/logs/prefuzzdup-verify.log",
+      "phase": "prefuzzdup_verify",
+      "wall_seconds": 224.85086754200165
+    },
+    {
+      "command": [
+        "/home/user/fl/PreFuzzDup-full/PreFuzzDup/build/prefuzzdup_persistent_lookup",
+        "--records",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/reference.csv",
+        "--queries",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/queries_bench_1000.csv",
+        "--db",
+        "/home/user/three-scheme-full-scratch/prefuzzdup_t4.sqlite",
+        "--tag-bits",
+        "256",
+        "--threshold",
+        "default=4",
+        "--fpp",
+        "0.01",
+        "--strategies",
+        "prefuzz",
+        "--repeat",
+        "3",
+        "--out",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/results/prefuzzdup_t4.csv"
+      ],
+      "exit_code": 0,
+      "log": "20260922-three-scheme-full/results/logs/prefuzzdup-t4.log",
+      "phase": "prefuzzdup_t4",
+      "wall_seconds": 2.139224036000087
+    },
+    {
+      "command": [
+        "/home/user/fl/PreFuzzDup-full/PreFuzzDup/build/prefuzzdup_persistent_lookup",
+        "--records",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/reference.csv",
+        "--queries",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/queries_bench_1000.csv",
+        "--db",
+        "/home/user/three-scheme-full-scratch/prefuzzdup_t5.sqlite",
+        "--tag-bits",
+        "256",
+        "--threshold",
+        "default=5",
+        "--fpp",
+        "0.01",
+        "--strategies",
+        "prefuzz",
+        "--repeat",
+        "3",
+        "--out",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/results/prefuzzdup_t5.csv"
+      ],
+      "exit_code": 0,
+      "log": "20260922-three-scheme-full/results/logs/prefuzzdup-t5.log",
+      "phase": "prefuzzdup_t5",
+      "wall_seconds": 2.4257299579985556
+    },
+    {
+      "command": [
+        "/home/user/fl/PreFuzzDup-full/PreFuzzDup/build/prefuzzdup_persistent_lookup",
+        "--records",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/reference.csv",
+        "--queries",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/queries_bench_1000.csv",
+        "--db",
+        "/home/user/three-scheme-full-scratch/prefuzzdup_t6.sqlite",
+        "--tag-bits",
+        "256",
+        "--threshold",
+        "default=6",
+        "--fpp",
+        "0.01",
+        "--strategies",
+        "prefuzz",
+        "--repeat",
+        "3",
+        "--out",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/results/prefuzzdup_t6.csv"
+      ],
+      "exit_code": 0,
+      "log": "20260922-three-scheme-full/results/logs/prefuzzdup-t6.log",
+      "phase": "prefuzzdup_t6",
+      "wall_seconds": 2.6190819930016005
+    },
+    {
+      "command": [
+        "/home/user/fl/PreFuzzDup-full/SimLESS/build/simless_lookup_benchmark",
+        "--scheme",
+        "simless",
+        "--records",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/reference.csv",
+        "--queries",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/queries_verify_100.csv",
+        "--labels",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/query_groups_verify_100.csv",
+        "--thresholds",
+        "4,5,6",
+        "--repeat",
+        "1",
+        "--db",
+        "/home/user/three-scheme-full-scratch/simless_verify.sqlite",
+        "--out",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/results/simless_verify.csv"
+      ],
+      "exit_code": 0,
+      "log": "20260922-three-scheme-full/results/logs/simless-verify.log",
+      "phase": "simless_verify",
+      "wall_seconds": 3.387004686999717
+    },
+    {
+      "command": [
+        "/home/user/fl/PreFuzzDup-full/SimLESS/build/simless_lookup_benchmark",
+        "--scheme",
+        "simless",
+        "--records",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/reference.csv",
+        "--queries",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/queries_bench_1000.csv",
+        "--labels",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/query_groups_bench_1000.csv",
+        "--thresholds",
+        "4,5,6",
+        "--repeat",
+        "3",
+        "--db",
+        "/home/user/three-scheme-full-scratch/simless_bench.sqlite",
+        "--out",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/results/simless_bench.csv"
+      ],
+      "exit_code": 0,
+      "log": "20260922-three-scheme-full/results/logs/simless-bench.log",
+      "phase": "simless_bench",
+      "wall_seconds": 84.86906698899838
+    },
+    {
+      "command": [
+        "/home/user/fl/PreFuzzDup-full/FuzzyDedup/build/fuzzydedup_lookup_benchmark",
+        "--scheme",
+        "fuzzydedup",
+        "--records",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/reference.csv",
+        "--queries",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/queries_verify_100.csv",
+        "--labels",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/query_groups_verify_100.csv",
+        "--thresholds",
+        "4,5,6",
+        "--repeat",
+        "1",
+        "--db",
+        "/home/user/three-scheme-full-scratch/fuzzydedup_verify.sqlite",
+        "--out",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/results/fuzzydedup_verify.csv"
+      ],
+      "exit_code": 0,
+      "log": "20260922-three-scheme-full/results/logs/fuzzydedup-verify.log",
+      "phase": "fuzzydedup_verify",
+      "wall_seconds": 1.7239588890006416
+    },
+    {
+      "command": [
+        "/home/user/fl/PreFuzzDup-full/FuzzyDedup/build/fuzzydedup_lookup_benchmark",
+        "--scheme",
+        "fuzzydedup",
+        "--records",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/reference.csv",
+        "--queries",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/queries_bench_1000.csv",
+        "--labels",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/query_groups_bench_1000.csv",
+        "--thresholds",
+        "4,5,6",
+        "--repeat",
+        "3",
+        "--db",
+        "/home/user/three-scheme-full-scratch/fuzzydedup_bench.sqlite",
+        "--out",
+        "/home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/results/fuzzydedup_bench.csv"
+      ],
+      "exit_code": 0,
+      "log": "20260922-three-scheme-full/results/logs/fuzzydedup-bench.log",
+      "phase": "fuzzydedup_bench",
+      "wall_seconds": 33.54005781399974
+    }
+  ],
+  "created_utc": "2026-09-22T12:42:19.205857+00:00",
+  "database_files": {
+    "fuzzydedup_bench.sqlite": 26689536,
+    "fuzzydedup_verify.sqlite": 26689536,
+    "prefuzzdup_t4.sqlite": 80617472,
+    "prefuzzdup_t5.sqlite": 90148864,
+    "prefuzzdup_t6.sqlite": 98947072,
+    "prefuzzdup_verify.sqlite": 98947072,
+    "simless_bench.sqlite": 26689536,
+    "simless_verify.sqlite": 26689536
+  },
+  "environment": {
+    "cmake": "cmake version 3.22.1",
+    "compiler": "c++ (Ubuntu 12.3.0-1ubuntu1~22.04) 12.3.0",
+    "cpu_model": "Intel(R) Xeon(R) Silver 4110 CPU @ 2.10GHz",
+    "git_transfer_measured": false,
+    "machine": "x86_64",
+    "memory_total": "263706116 kB",
+    "page_cache_cleared": false,
+    "platform": "Linux-6.8.0-59-generic-x86_64-with-glibc2.35",
+    "python": "3.13.2 | packaged by Anaconda, Inc. | (main, Feb  6 2025, 18:56:02) [GCC 11.2.0]",
+    "release": "6.8.0-59-generic",
+    "sqlite_application_cache_kib": 1024,
+    "sqlite_package": "3.37.2",
+    "system": "Linux",
+    "uname": "Linux user-ThinkStation-P920 6.8.0-59-generic #61~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Tue Apr 15 17:03:15 UTC 2 x86_64 x86_64 x86_64 GNU/Linux"
+  },
+  "expected_result_rows_per_scheme": 9000,
+  "failure": null,
+  "notes": [
+    "Git transfer time was not measured.",
+    "OS page cache was not cleared.",
+    "SQLite application page cache is approximately 1 MiB.",
+    "Commands ran in the fixed order recorded in commands.",
+    "Latency differences are descriptive; workload equality is required."
+  ],
+  "package_type": "three_scheme_lookup_handoff_result",
+  "prefuzz_metadata": {
+    "4": {
+      "disk_index_reused": 1,
+      "filter_bytes_estimate": 9064616,
+      "index_prepare_us": 964310,
+      "records": 413921,
+      "sqlite_cache_kib": 1024,
+      "tag_bits": 256
+    },
+    "5": {
+      "disk_index_reused": 1,
+      "filter_bytes_estimate": 10877088,
+      "index_prepare_us": 1151145,
+      "records": 413921,
+      "sqlite_cache_kib": 1024,
+      "tag_bits": 256
+    },
+    "6": {
+      "disk_index_reused": 1,
+      "filter_bytes_estimate": 12689480,
+      "index_prepare_us": 1296560,
+      "records": 413921,
+      "sqlite_cache_kib": 1024,
+      "tag_bits": 256
+    }
+  },
+  "repeat": 3,
+  "result_files": {
+    "README.md": {
+      "sha256": "f75e5882a535270abaf7e9d8f2edf3d087d2642f3a9d5e38daf0406bb1adcdf5",
+      "size_bytes": 157
+    },
+    "environment.json": {
+      "sha256": "116a96bbfe284935f62cfee80168f3519e572507973e84a3568af740ddfde623",
+      "size_bytes": 718
+    },
+    "fuzzydedup_bench.csv": {
+      "sha256": "3d876efbe1e32e0743d42863bf44cc8a0f7a205349bc56c7dde2c4aac50a5196",
+      "size_bytes": 638176
+    },
+    "fuzzydedup_verify.csv": {
+      "sha256": "a24ba39c94e5bcbe0b3fc142e7a8572b90cb4987d1d8eaffcabbbcb91a818d8e",
+      "size_bytes": 20270
+    },
+    "logs/build-fuzzydedup-configure.log": {
+      "sha256": "f0b55986646fa58ecf72ce2e3c9723cc4134ec57c99a316216e1570d3cbca62c",
+      "size_bytes": 410
+    },
+    "logs/build-fuzzydedup.log": {
+      "sha256": "26c04305f0900f0511c0bf57ace3fa8164be970a2899c066cc4ed559c84ecf54",
+      "size_bytes": 327
+    },
+    "logs/build-prefuzzdup-configure.log": {
+      "sha256": "51578bb043a1a08a7ec211376d3a6449bd43586862c131c8bb088f13d1ec17a2",
+      "size_bytes": 346
+    },
+    "logs/build-prefuzzdup.log": {
+      "sha256": "baa508996f9a05f6780bd05f8141cb733efd1290432146bfe9f0e05d5cda4882",
+      "size_bytes": 330
+    },
+    "logs/build-simless-configure.log": {
+      "sha256": "daed685b0d8d8e82244f78f6d66896e074744e30015b73fd664737c7012cf41e",
+      "size_bytes": 398
+    },
+    "logs/build-simless.log": {
+      "sha256": "2f34d408f5c81a8e7d159552ebb1b550e97342e6606345c0119fad3849da75e3",
+      "size_bytes": 315
+    },
+    "logs/fuzzydedup-bench.log": {
+      "sha256": "4f49e9bcc7e0de80799b5230d1943c4cbfef89e8f315603785698df62af30d56",
+      "size_bytes": 1111
+    },
+    "logs/fuzzydedup-verify.log": {
+      "sha256": "13b920d84bdae78f60b9e2e6a3260f0e9ccdea03dc9aabe34854126ffbc3928d",
+      "size_bytes": 888
+    },
+    "logs/prefuzzdup-t4.log": {
+      "sha256": "5b08674a96c7d8d4e0e29ec526d7e20eb87ba8e5128e1b0d28a9252fabf757e4",
+      "size_bytes": 936
+    },
+    "logs/prefuzzdup-t5.log": {
+      "sha256": "de6746a3df22c6219f64726c97e85e68cda4f6cb1c13d78489bfa87ae6c375c6",
+      "size_bytes": 939
+    },
+    "logs/prefuzzdup-t6.log": {
+      "sha256": "550bf1b11a196190c79074776ead6e8d517ce43225954092e374348a3f09ccb0",
+      "size_bytes": 939
+    },
+    "logs/prefuzzdup-verify.log": {
+      "sha256": "33e40cc80fe7d6d74d123df095f4d0fbf547e363d886d2a25a5b4b79503b2a1e",
+      "size_bytes": 1031
+    },
+    "logs/simless-bench.log": {
+      "sha256": "c5f28977fd9466ba82a6a0ea32ed2721c66f5fcef72802e1daf2a27ed2fd94c4",
+      "size_bytes": 1079
+    },
+    "logs/simless-verify.log": {
+      "sha256": "4b843f4aec50fb622a4acc42325538d28e871b93ac9a7fd73f0e6f4d8a210b10",
+      "size_bytes": 867
+    },
+    "prefuzzdup_t4.csv": {
+      "sha256": "559490c38faefdaefad35b4974b3bfb7004abc9f0cda8c665d0a8213f73abd47",
+      "size_bytes": 139559
+    },
+    "prefuzzdup_t5.csv": {
+      "sha256": "57db5c79fc110db1b63433b502aa2e17df865b2c45e8df23e2e4e3b9aa0a86b3",
+      "size_bytes": 139875
+    },
+    "prefuzzdup_t6.csv": {
+      "sha256": "e3f9297e846a4450a4f125e7d7c11fc296c2fa5dfae17797fbab9a61bc94e58b",
+      "size_bytes": 140252
+    },
+    "prefuzzdup_verify.csv": {
+      "sha256": "d461811dff664ea823419ad222fbaad80d9610fc1c0a2ac6abbc25eae60c9da7",
+      "size_bytes": 4775
+    },
+    "simless_bench.csv": {
+      "sha256": "973f402ca9d2afcfc6d04d554cefd7f91f4f3ad86ef4d5c9aa37abb0153a2b87",
+      "size_bytes": 649084
+    },
+    "simless_verify.csv": {
+      "sha256": "2fde354615ad0aad4e565a1dfbc91e339050dae08c29be42920c1a1b35a5039d",
+      "size_bytes": 20641
+    }
+  },
+  "scale": "full",
+  "schema_version": 1,
+  "server_git_commit": "2a0d1caaed30737806a9e9292432402760112827",
+  "source_handoff_manifest_sha256": "b4ac0b055dffc6a6d41540c227d29e382b20b91aed5e72efdec1144d402325ca",
+  "status": "passed",
+  "thresholds": [
+    4,
+    5,
+    6
+  ]
+}

@@ -1,0 +1,15 @@
+$ /home/user/fl/PreFuzzDup-full/FuzzyDedup/build/fuzzydedup_lookup_benchmark --scheme fuzzydedup --records /home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/reference.csv --queries /home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/queries_bench_1000.csv --labels /home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/query_groups_bench_1000.csv --thresholds 4,5,6 --repeat 3 --db /home/user/three-scheme-full-scratch/fuzzydedup_bench.sqlite --out /home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/results/fuzzydedup_bench.csv
+cwd: /home/user/fl/PreFuzzDup-full
+
+[stdout]
+fuzzydedup threshold=4 group=exact_ref mean_us=2694.4 samples=2154
+fuzzydedup threshold=4 group=no_exact_ref mean_us=4538.07 samples=846
+fuzzydedup threshold=5 group=exact_ref mean_us=3037.19 samples=2154
+fuzzydedup threshold=5 group=no_exact_ref mean_us=5213.49 samples=846
+fuzzydedup threshold=6 group=exact_ref mean_us=3375.65 samples=2154
+fuzzydedup threshold=6 group=no_exact_ref mean_us=5918.13 samples=846
+
+[stderr]
+
+[exit-code] 0
+[wall-seconds] 33.540058

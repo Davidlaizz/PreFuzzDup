@@ -1,0 +1,11 @@
+$ cmake --build /home/user/fl/PreFuzzDup-full/PreFuzzDup/build --target prefuzzdup_persistent_lookup -j
+cwd: /home/user/fl/PreFuzzDup-full
+
+[stdout]
+Consolidate compiler generated dependencies of target prefuzzdup_persistent_lookup
+[100%] Built target prefuzzdup_persistent_lookup
+
+[stderr]
+
+[exit-code] 0
+[wall-seconds] 0.200503

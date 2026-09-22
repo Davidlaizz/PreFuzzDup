@@ -89,7 +89,7 @@ METADATA_METRICS = (
     "sqlite_cache_kib",
 )
 RESULT_ROWS_PER_SCHEME = BENCHMARK_QUERY_COUNT * REPEAT * len(THRESHOLDS)
-RESULT_KEYS_PER_SCHEME = BENCHMARK_QUERY_COUNT * REPEAT
+RESULT_KEYS_PER_SCHEME = RESULT_ROWS_PER_SCHEME
 
 
 def fail(message: str) -> None:
@@ -421,6 +421,7 @@ def validate_prefuzz_csv(path: Path, expected_rows: int, threshold: int, query_i
             fail(f"negative PreFuzzDup metric in {path}")
         if int(row["filter_queries"]) != threshold + 1:
             fail(f"unexpected filter query count in {path}: {row['filter_queries']}")
+        row["threshold"] = str(threshold)
     return rows
 
 
@@ -544,7 +545,7 @@ def parse_prefuzz_metadata(stdout: str) -> dict[str, Any]:
             result[key] = float(value)
         else:
             result[key] = value
-    if not METADATA_METRICS.issubset(result):
+    if not set(METADATA_METRICS).issubset(result):
         fail(f"PreFuzzDup metadata is incomplete: {line}")
     return result
 
@@ -999,9 +1000,6 @@ def main() -> int:
         return 1
 
 
-if __name__ == "__main__":
-    raise SystemExit(main())
-
 def result_key(row: dict[str, str]) -> tuple[int, int, str]:
     return int(row["threshold"]), int(row["repeat"]), row["query_id"]
 
@@ -1225,3 +1223,7 @@ def run_server(package: Path, scratch: Path, repo: Path) -> None:
         if results.exists():
             result_manifest["result_files"] = file_inventory(results, results / "server-result-manifest.json")
         write_json(results / "server-result-manifest.json", result_manifest)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

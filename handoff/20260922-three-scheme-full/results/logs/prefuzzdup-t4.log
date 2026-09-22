@@ -1,0 +1,11 @@
+$ /home/user/fl/PreFuzzDup-full/PreFuzzDup/build/prefuzzdup_persistent_lookup --records /home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/reference.csv --queries /home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/inputs/queries_bench_1000.csv --db /home/user/three-scheme-full-scratch/prefuzzdup_t4.sqlite --tag-bits 256 --threshold default=4 --fpp 0.01 --strategies prefuzz --repeat 3 --out /home/user/fl/PreFuzzDup-full/handoff/20260922-three-scheme-full/results/prefuzzdup_t4.csv
+cwd: /home/user/fl/PreFuzzDup-full
+
+[stdout]
+records=413921, tag_bits=256, index_prepare_us=964310, disk_index_reused=1, filter_bytes_estimate=9064616, sqlite_cache_kib=1024
+prefuzz: queries=3000, mean_us=85.94, p95_us=167.00, mean_candidates=4.46, mean_distance_computations=5.59, mean_filter_queries=5.00, mean_inverted_lookups=3.67, mean_posting_records_read=22.10
+
+[stderr]
+
+[exit-code] 0
+[wall-seconds] 2.139224

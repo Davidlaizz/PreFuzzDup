@@ -1,0 +1,13 @@
+$ cmake -S /home/user/fl/PreFuzzDup-full/FuzzyDedup -B /home/user/fl/PreFuzzDup-full/FuzzyDedup/build -DCMAKE_BUILD_TYPE=Release
+cwd: /home/user/fl/PreFuzzDup-full
+
+[stdout]
+-- PBC/GMP not found; building fuzzydedup lookup benchmark only
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/user/fl/PreFuzzDup-full/FuzzyDedup/build
+
+[stderr]
+
+[exit-code] 0
+[wall-seconds] 0.062327
