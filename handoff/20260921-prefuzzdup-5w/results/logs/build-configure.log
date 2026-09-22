@@ -1,0 +1,11 @@
+$ cmake -S /home/user/fl/PreFuzzDup/PreFuzzDup -B /home/user/fl/PreFuzzDup/PreFuzzDup/build -DCMAKE_BUILD_TYPE=Release
+cwd: /home/user/fl/PreFuzzDup
+
+[stdout]
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/user/fl/PreFuzzDup/PreFuzzDup/build
+
+[stderr]
+
+[exit-code] 0

@@ -1,0 +1,132 @@
+$ cmake --build /home/user/fl/PreFuzzDup/PreFuzzDup/build -j
+cwd: /home/user/fl/PreFuzzDup
+
+[stdout]
+[ 25%] Building CXX object CMakeFiles/prefuzzdup.dir/src/main.cpp.o
+[ 50%] Building CXX object CMakeFiles/prefuzzdup_persistent_lookup.dir/src/persistent_lookup.cpp.o
+[ 75%] Linking CXX executable prefuzzdup_persistent_lookup
+[ 75%] Built target prefuzzdup_persistent_lookup
+[100%] Linking CXX executable prefuzzdup
+[100%] Built target prefuzzdup
+
+[stderr]
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/persistent_lookup.cpp: In function ‘std::vector<pf::Item> pf::load_manifest(const std::string&, std::size_t)’:
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/persistent_lookup.cpp:60:3: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   60 |   if (items.empty()) fail(path + ": 未读取到记录。"); return items;
+      |   ^~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/persistent_lookup.cpp:60:55: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   60 |   if (items.empty()) fail(path + ": 未读取到记录。"); return items;
+      |                                                       ^~~~~~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/persistent_lookup.cpp: In member function ‘pf::QueryResult pf::PersistentIndex::indexed(const pf::Item&, bool) const’:
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/persistent_lookup.cpp:225:7: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  225 |       if (code != SQLITE_DONE) fail("持久化倒排查询失败。"); sqlite3_reset(lookup); sqlite3_clear_bindings(lookup);
+      |       ^~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/persistent_lookup.cpp:225:62: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  225 |       if (code != SQLITE_DONE) fail("持久化倒排查询失败。"); sqlite3_reset(lookup); sqlite3_clear_bindings(lookup);
+      |                                                              ^~~~~~~~~~~~~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp: In function ‘EVP_PKEY* {anonymous}::ed_private(std::span<const unsigned char>)’:
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:146:3: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  146 |   if (!key) fail("Ed25519 private-key derivation failed"); return key;
+      |   ^~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:146:60: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  146 |   if (!key) fail("Ed25519 private-key derivation failed"); return key;
+      |                                                            ^~~~~~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp: In function ‘bool {anonymous}::verify_ed(std::span<const unsigned char>, std::span<const unsigned char>, std::span<const unsigned char>)’:
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:162:3: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  162 |   if (ctx) EVP_MD_CTX_free(ctx); EVP_PKEY_free(key); return ok;
+      |   ^~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:162:34: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  162 |   if (ctx) EVP_MD_CTX_free(ctx); EVP_PKEY_free(key); return ok;
+      |                                  ^~~~~~~~~~~~~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp: In function ‘int {anonymous}::hamming(std::span<const unsigned char>, std::span<const unsigned char>)’:
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:169:3: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  169 |   if (a.size() != b.size()) fail("Hamming distance length mismatch"); int d = 0; for (std::size_t i = 0; i < a.size(); ++i) d += __builtin_popcount(static_cast<unsigned>(a[i] ^ b[i])); return d;
+      |   ^~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:169:71: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  169 |   if (a.size() != b.size()) fail("Hamming distance length mismatch"); int d = 0; for (std::size_t i = 0; i < a.size(); ++i) d += __builtin_popcount(static_cast<unsigned>(a[i] ^ b[i])); return d;
+      |                                                                       ^~~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp: In member function ‘Bytes {anonymous}::Bch255::encode(std::span<const unsigned char>) const’:
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:177:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  177 |     if (msg.size() != 26) fail("BCH message must have 207 bits in 26 bytes"); Bytes out(32, 0);
+      |     ^~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:177:79: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  177 |     if (msg.size() != 26) fail("BCH message must have 207 bits in 26 bytes"); Bytes out(32, 0);
+      |                                                                               ^~~~~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp: In member function ‘std::optional<std::vector<unsigned char> > {anonymous}::Bch255::decode(Bytes) const’:
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:182:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  182 |     if (received.size() != 32) return std::nullopt; setbit(received, 255, false);
+      |     ^~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:182:53: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  182 |     if (received.size() != 32) return std::nullopt; setbit(received, 255, false);
+      |                                                     ^~~~~~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp: In function ‘Bytes {anonymous}::toeplitz_hash(std::span<const unsigned char>, std::span<const unsigned char>)’:
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:216:3: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  216 |   if (x.size() != 32 || seed.size() != 64) fail("Toeplitz input size mismatch"); Bytes out(32, 0);
+      |   ^~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:216:82: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  216 |   if (x.size() != 32 || seed.size() != 64) fail("Toeplitz input size mismatch"); Bytes out(32, 0);
+      |                                                                                  ^~~~~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp: In member function ‘{anonymous}::FeOutput {anonymous}::FuzzyExtractor::gen(std::span<const unsigned char>) const’:
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:224:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  224 |     if (x.size() != 32) fail("fuzzy extractor input must be 256 bits"); Bytes msg = random_bytes(26); setbit(msg, 207, false); // unused high bit
+      |     ^~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:224:73: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  224 |     if (x.size() != 32) fail("fuzzy extractor input must be 256 bits"); Bytes msg = random_bytes(26); setbit(msg, 207, false); // unused high bit
+      |                                                                         ^~~~~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp: In member function ‘std::optional<std::vector<unsigned char> > {anonymous}::FuzzyExtractor::rep(std::span<const unsigned char>, std::span<const unsigned char>) const’:
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:229:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  229 |     if (x.size() != 32 || P.size() != kHelperBytes) return std::nullopt; Bytes sketch(P.begin(), P.begin() + 32), noisy(32, 0);
+      |     ^~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:229:74: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  229 |     if (x.size() != 32 || P.size() != kHelperBytes) return std::nullopt; Bytes sketch(P.begin(), P.begin() + 32), noisy(32, 0);
+      |                                                                          ^~~~~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:230:5: warning: this ‘for’ clause does not guard... [-Wmisleading-indentation]
+  230 |     for (std::size_t i = 0; i < 32; ++i) noisy[i] = x[i] ^ sketch[i]; setbit(noisy, 255, false); auto code = bch_.decode(noisy); if (!code) return std::nullopt;
+      |     ^~~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:230:71: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+  230 |     for (std::size_t i = 0; i < 32; ++i) noisy[i] = x[i] ^ sketch[i]; setbit(noisy, 255, false); auto code = bch_.decode(noisy); if (!code) return std::nullopt;
+      |                                                                       ^~~~~~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp: In function ‘std::string {anonymous}::normalize_text(std::span<const unsigned char>)’:
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:240:3: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  240 |   if (!out.empty() && out.back() == ' ') out.pop_back(); return out;
+      |   ^~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:240:58: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  240 |   if (!out.empty() && out.back() == ' ') out.pop_back(); return out;
+      |                                                          ^~~~~~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp: In function ‘Bytes {anonymous}::simhash_text(std::span<const unsigned char>, std::string_view)’:
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:244:3: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  244 |   if (w.empty()) w.push_back("empty"); std::array<int, 256> score{};
+      |   ^~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:244:40: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  244 |   if (w.empty()) w.push_back("empty"); std::array<int, 256> score{};
+      |                                        ^~~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp: In function ‘Bytes {anonymous}::segment(std::span<const unsigned char>, int, int)’:
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:300:3: warning: this ‘for’ clause does not guard... [-Wmisleading-indentation]
+  300 |   for (int b = start; b < end; ++b) if (getbit(tag, b)) setbit(out, b - start, true); return out;
+      |   ^~~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:300:87: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+  300 |   for (int b = start; b < end; ++b) if (getbit(tag, b)) setbit(out, b - start, true); return out;
+      |                                                                                       ^~~~~~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp: In member function ‘void {anonymous}::Server::setup(std::size_t, double, std::map<std::__cxx11::basic_string<char>, int>)’:
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:335:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  335 |     if (thresholds.empty()) fail("at least one threshold is required"); for (const auto& [t,d] : thresholds) if (d < 0 || d >= 256) fail("each search threshold must be in [0,255]");
+      |     ^~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:335:73: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  335 |     if (thresholds.empty()) fail("at least one threshold is required"); for (const auto& [t,d] : thresholds) if (d < 0 || d >= 256) fail("each search threshold must be in [0,255]");
+      |                                                                         ^~~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp: In member function ‘bool {anonymous}::Server::consume_verify(const std::string&, const {anonymous}::Record&, std::span<const unsigned char>, std::span<const unsigned char>, std::span<const unsigned char>)’:
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:386:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  386 |     if(!permitted) return false; return verify_ed(r.vk, challenge_message(uid,r,query_tag,token),sig);
+      |     ^~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:386:34: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  386 |     if(!permitted) return false; return verify_ed(r.vk, challenge_message(uid,r,query_tag,token),sig);
+      |                                  ^~~~~~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp: In function ‘std::optional<std::vector<unsigned char> > {anonymous}::recover(Server&, const Record&, std::span<const unsigned char>, std::span<const unsigned char>, const FuzzyExtractor&)’:
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:425:3: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  425 |   if(!equal_ct(make_tag(*file,r.type),r.tag) || hamming(query_tag,make_tag(*file,r.type))>s.threshold(r.type))return std::nullopt;auto Rr=fe.rep(recovery_representation(*file,r.type),r.helper);if(!Rr)return std::nullopt;Bytes zero(32,0);if(!equal_ct(hkdf_extract(zero,*Rr),Q))return std::nullopt;return file;
+      |   ^~
+/home/user/fl/PreFuzzDup/PreFuzzDup/src/main.cpp:425:131: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  425 |   if(!equal_ct(make_tag(*file,r.type),r.tag) || hamming(query_tag,make_tag(*file,r.type))>s.threshold(r.type))return std::nullopt;auto Rr=fe.rep(recovery_representation(*file,r.type),r.helper);if(!Rr)return std::nullopt;Bytes zero(32,0);if(!equal_ct(hkdf_extract(zero,*Rr),Q))return std::nullopt;return file;
+      |                                                                                                                                   ^~~~
+
+[exit-code] 0

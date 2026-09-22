@@ -1,0 +1,225 @@
+{
+  "commands": [
+    {
+      "command": [
+        "cmake",
+        "-S",
+        "/home/user/fl/PreFuzzDup/PreFuzzDup",
+        "-B",
+        "/home/user/fl/PreFuzzDup/PreFuzzDup/build",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "phase": "configure"
+    },
+    {
+      "command": [
+        "cmake",
+        "--build",
+        "/home/user/fl/PreFuzzDup/PreFuzzDup/build",
+        "-j"
+      ],
+      "phase": "build"
+    },
+    {
+      "command": [
+        "/home/user/fl/PreFuzzDup/PreFuzzDup/build/prefuzzdup_persistent_lookup",
+        "--records",
+        "/home/user/fl/PreFuzzDup/handoff/20260921-prefuzzdup-5w/inputs/reference.csv",
+        "--queries",
+        "/home/user/fl/PreFuzzDup/handoff/20260921-prefuzzdup-5w/inputs/queries_verify_100.csv",
+        "--db",
+        "/home/user/prefuzzdup-5w-scratch/prefuzz_verify.sqlite",
+        "--tag-bits",
+        "256",
+        "--threshold",
+        "default=6",
+        "--fpp",
+        "0.01",
+        "--strategies",
+        "prefuzz",
+        "--repeat",
+        "1",
+        "--verify-equivalence",
+        "--out",
+        "/home/user/fl/PreFuzzDup/handoff/20260921-prefuzzdup-5w/results/prefuzz_verify.csv"
+      ],
+      "phase": "verify"
+    },
+    {
+      "command": [
+        "/home/user/fl/PreFuzzDup/PreFuzzDup/build/prefuzzdup_persistent_lookup",
+        "--records",
+        "/home/user/fl/PreFuzzDup/handoff/20260921-prefuzzdup-5w/inputs/reference.csv",
+        "--queries",
+        "/home/user/fl/PreFuzzDup/handoff/20260921-prefuzzdup-5w/inputs/queries_bench_1000.csv",
+        "--db",
+        "/home/user/prefuzzdup-5w-scratch/prefuzz_t4.sqlite",
+        "--tag-bits",
+        "256",
+        "--threshold",
+        "default=4",
+        "--fpp",
+        "0.01",
+        "--strategies",
+        "prefuzz",
+        "--repeat",
+        "3",
+        "--out",
+        "/home/user/fl/PreFuzzDup/handoff/20260921-prefuzzdup-5w/results/prefuzz_t4.csv"
+      ],
+      "phase": "benchmark_t4"
+    },
+    {
+      "command": [
+        "/home/user/fl/PreFuzzDup/PreFuzzDup/build/prefuzzdup_persistent_lookup",
+        "--records",
+        "/home/user/fl/PreFuzzDup/handoff/20260921-prefuzzdup-5w/inputs/reference.csv",
+        "--queries",
+        "/home/user/fl/PreFuzzDup/handoff/20260921-prefuzzdup-5w/inputs/queries_bench_1000.csv",
+        "--db",
+        "/home/user/prefuzzdup-5w-scratch/prefuzz_t5.sqlite",
+        "--tag-bits",
+        "256",
+        "--threshold",
+        "default=5",
+        "--fpp",
+        "0.01",
+        "--strategies",
+        "prefuzz",
+        "--repeat",
+        "3",
+        "--out",
+        "/home/user/fl/PreFuzzDup/handoff/20260921-prefuzzdup-5w/results/prefuzz_t5.csv"
+      ],
+      "phase": "benchmark_t5"
+    },
+    {
+      "command": [
+        "/home/user/fl/PreFuzzDup/PreFuzzDup/build/prefuzzdup_persistent_lookup",
+        "--records",
+        "/home/user/fl/PreFuzzDup/handoff/20260921-prefuzzdup-5w/inputs/reference.csv",
+        "--queries",
+        "/home/user/fl/PreFuzzDup/handoff/20260921-prefuzzdup-5w/inputs/queries_bench_1000.csv",
+        "--db",
+        "/home/user/prefuzzdup-5w-scratch/prefuzz_t6.sqlite",
+        "--tag-bits",
+        "256",
+        "--threshold",
+        "default=6",
+        "--fpp",
+        "0.01",
+        "--strategies",
+        "prefuzz",
+        "--repeat",
+        "3",
+        "--out",
+        "/home/user/fl/PreFuzzDup/handoff/20260921-prefuzzdup-5w/results/prefuzz_t6.csv"
+      ],
+      "phase": "benchmark_t6"
+    }
+  ],
+  "created_utc": "2026-09-22T07:37:26.264722+00:00",
+  "database_files": {
+    "prefuzz_t4.sqlite": 7872512,
+    "prefuzz_t5.sqlite": 8769536,
+    "prefuzz_t6.sqlite": 9625600,
+    "prefuzz_verify.sqlite": 9625600
+  },
+  "failure": null,
+  "files": {
+    "README.md": {
+      "sha256": "b4ceb7852049fedf220a8f19b44aa1a68f17aaef1044d4e57ab0965991db3c73",
+      "size_bytes": 162
+    },
+    "environment.json": {
+      "sha256": "93c07f1f8af43c60d4332752d7dc3db5d7e1eac5003387fce2725dcc26705369",
+      "size_bytes": 649
+    },
+    "logs/build-configure.log": {
+      "sha256": "f41d509d79ed7b9a2b050b7dbbe3d25b7852cfc0cfccb42645944983f821bc2d",
+      "size_bytes": 302
+    },
+    "logs/build.log": {
+      "sha256": "1d72ca04fdd53ee26ac60c87ded7092ade43bea67b52de13e961e87ef2a23957",
+      "size_bytes": 14290
+    },
+    "logs/prefuzz_t4.log": {
+      "sha256": "033f093596d17e364b035cea1483b30d40bc31e7d7ec41a05d21349c7875620b",
+      "size_bytes": 862
+    },
+    "logs/prefuzz_t5.log": {
+      "sha256": "1d9b1d7f7993aab795a0220097e7808b72f00745d31aca35a14bf3f3d6e7fd5d",
+      "size_bytes": 863
+    },
+    "logs/prefuzz_t6.log": {
+      "sha256": "47c344264e9feb0d459c9f5b7810bae6b6e9d449ef26b82f5424599cc23635c6",
+      "size_bytes": 863
+    },
+    "logs/prefuzz_verify.log": {
+      "sha256": "3a5b301ba8fc8c8dd59d6f520a0f2fcf7a580a53ed77f28b8ef838a71403bc5f",
+      "size_bytes": 955
+    },
+    "prefuzz_t4.csv": {
+      "sha256": "702aab503be8c397325e818a90072a212de0e93e3637f35412e07bbe9c6a73b8",
+      "size_bytes": 120925
+    },
+    "prefuzz_t5.csv": {
+      "sha256": "5cd1368719960d1a065670e006f5945126b5915ef12b97bc606c7c0f5cceb90f",
+      "size_bytes": 120970
+    },
+    "prefuzz_t6.csv": {
+      "sha256": "a7517696b89f2802eaa54fa20cfb885600c7759868c2d114942481799aeb71f9",
+      "size_bytes": 121039
+    },
+    "prefuzz_verify.csv": {
+      "sha256": "d5c8fbde03660052c4db33c31ed0e1ccb3433f8cc578c95d1e23e7704ba7ac98",
+      "size_bytes": 4217
+    }
+  },
+  "fpp": "0.01",
+  "notes": [
+    "Offline batch handoff; no client-server network latency was measured.",
+    "The OS page cache was not cleared.",
+    "SQLite application cache is approximately 1 MiB.",
+    "Thresholds ran in the fixed order 4, 5, 6."
+  ],
+  "package_type": "prefuzzdup_lookup_handoff_result",
+  "prefuzz_metadata": {
+    "4": {
+      "disk_index_reused": 0,
+      "filter_bytes_estimate": 987864,
+      "index_prepare_us": 1395298,
+      "records": 41392,
+      "sqlite_cache_kib": 1024,
+      "tag_bits": 256
+    },
+    "5": {
+      "disk_index_reused": 0,
+      "filter_bytes_estimate": 1183392,
+      "index_prepare_us": 1666405,
+      "records": 41392,
+      "sqlite_cache_kib": 1024,
+      "tag_bits": 256
+    },
+    "6": {
+      "disk_index_reused": 0,
+      "filter_bytes_estimate": 1385496,
+      "index_prepare_us": 2049283,
+      "records": 41392,
+      "sqlite_cache_kib": 1024,
+      "tag_bits": 256
+    }
+  },
+  "repeat": 3,
+  "scale": "5w",
+  "schema_version": 1,
+  "server_git_commit": "529d5b50e8f240d058aab3eb52b9a1d2fa54d213",
+  "source_handoff_manifest_sha256": "434deb9a2a99de2bc01f2f134d821106dec1697567ea263c23fe480b0557c2ca",
+  "status": "passed",
+  "tag_bits": 256,
+  "thresholds": [
+    4,
+    5,
+    6
+  ]
+}
