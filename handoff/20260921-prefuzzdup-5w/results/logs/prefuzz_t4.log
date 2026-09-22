@@ -1,0 +1,10 @@
+$ /home/user/fl/PreFuzzDup/PreFuzzDup/build/prefuzzdup_persistent_lookup --records /home/user/fl/PreFuzzDup/handoff/20260921-prefuzzdup-5w/inputs/reference.csv --queries /home/user/fl/PreFuzzDup/handoff/20260921-prefuzzdup-5w/inputs/queries_bench_1000.csv --db /home/user/prefuzzdup-5w-scratch/prefuzz_t4.sqlite --tag-bits 256 --threshold default=4 --fpp 0.01 --strategies prefuzz --repeat 3 --out /home/user/fl/PreFuzzDup/handoff/20260921-prefuzzdup-5w/results/prefuzz_t4.csv
+cwd: /home/user/fl/PreFuzzDup
+
+[stdout]
+records=41392, tag_bits=256, index_prepare_us=1395298, disk_index_reused=0, filter_bytes_estimate=987864, sqlite_cache_kib=1024
+prefuzz: queries=3000, mean_us=10.45, p95_us=47.00, mean_candidates=0.42, mean_distance_computations=0.49, mean_filter_queries=5.00, mean_inverted_lookups=0.89, mean_posting_records_read=2.00
+
+[stderr]
+
+[exit-code] 0

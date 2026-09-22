@@ -1,0 +1,14 @@
+{
+  "compiler": "c++ (Ubuntu 12.3.0-1ubuntu1~22.04) 12.3.0",
+  "cpu_model": "Intel(R) Xeon(R) Silver 4110 CPU @ 2.10GHz",
+  "machine": "x86_64",
+  "memory_total": "263706116 kB",
+  "page_cache_cleared": false,
+  "platform": "Linux-6.8.0-59-generic-x86_64-with-glibc2.35",
+  "python": "3.13.2 | packaged by Anaconda, Inc. | (main, Feb  6 2025, 18:56:02) [GCC 11.2.0]",
+  "release": "6.8.0-59-generic",
+  "sqlite_application_cache_kib": 1024,
+  "sqlite_package": "3.37.2",
+  "system": "Linux",
+  "uname": "Linux user-ThinkStation-P920 6.8.0-59-generic #61~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Tue Apr 15 17:03:15 UTC 2 x86_64 x86_64 x86_64 GNU/Linux"
+}
