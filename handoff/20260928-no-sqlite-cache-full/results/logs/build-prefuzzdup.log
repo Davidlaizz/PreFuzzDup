@@ -1,0 +1,27 @@
+$ cmake --build /home/user/fl/PreFuzzDup-full/PreFuzzDup/build --target prefuzzdup_persistent_lookup -j
+cwd: /home/user/fl/PreFuzzDup-full
+
+[stdout]
+Consolidate compiler generated dependencies of target prefuzzdup_persistent_lookup
+[ 50%] Building CXX object CMakeFiles/prefuzzdup_persistent_lookup.dir/src/persistent_lookup.cpp.o
+[100%] Linking CXX executable prefuzzdup_persistent_lookup
+[100%] Built target prefuzzdup_persistent_lookup
+
+[stderr]
+/home/user/fl/PreFuzzDup-full/PreFuzzDup/src/persistent_lookup.cpp: In function ‘std::vector<pf::Item> pf::load_manifest(const std::string&, std::size_t)’:
+/home/user/fl/PreFuzzDup-full/PreFuzzDup/src/persistent_lookup.cpp:60:3: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   60 |   if (items.empty()) fail(path + ": 未读取到记录。"); return items;
+      |   ^~
+/home/user/fl/PreFuzzDup-full/PreFuzzDup/src/persistent_lookup.cpp:60:55: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   60 |   if (items.empty()) fail(path + ": 未读取到记录。"); return items;
+      |                                                       ^~~~~~
+/home/user/fl/PreFuzzDup-full/PreFuzzDup/src/persistent_lookup.cpp: In member function ‘pf::QueryResult pf::PersistentIndex::indexed(const pf::Item&, bool) const’:
+/home/user/fl/PreFuzzDup-full/PreFuzzDup/src/persistent_lookup.cpp:229:7: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  229 |       if (code != SQLITE_DONE) fail("持久化倒排查询失败。"); sqlite3_reset(lookup); sqlite3_clear_bindings(lookup);
+      |       ^~
+/home/user/fl/PreFuzzDup-full/PreFuzzDup/src/persistent_lookup.cpp:229:62: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  229 |       if (code != SQLITE_DONE) fail("持久化倒排查询失败。"); sqlite3_reset(lookup); sqlite3_clear_bindings(lookup);
+      |                                                              ^~~~~~~~~~~~~
+
+[exit-code] 0
+[wall-seconds] 6.838571

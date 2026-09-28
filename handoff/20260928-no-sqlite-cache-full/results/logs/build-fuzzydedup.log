@@ -1,0 +1,13 @@
+$ cmake --build /home/user/fl/PreFuzzDup-full/FuzzyDedup/build --target fuzzydedup_lookup_benchmark -j
+cwd: /home/user/fl/PreFuzzDup-full
+
+[stdout]
+Consolidate compiler generated dependencies of target fuzzydedup_lookup_benchmark
+[ 50%] Building CXX object CMakeFiles/fuzzydedup_lookup_benchmark.dir/src/lookup_benchmark.cpp.o
+[100%] Linking CXX executable fuzzydedup_lookup_benchmark
+[100%] Built target fuzzydedup_lookup_benchmark
+
+[stderr]
+
+[exit-code] 0
+[wall-seconds] 4.169486
