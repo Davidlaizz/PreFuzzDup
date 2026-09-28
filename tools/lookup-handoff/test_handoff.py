@@ -122,6 +122,24 @@ class ClientPackageTests(unittest.TestCase):
             self.assertFalse(bench[0]["payload_digest"])
             self.assertFalse(bench[0]["source_ref"])
 
+    def test_client_package_records_no_sqlite_cache_contract(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = prepare_source(root)
+            baseline = prepare_baseline(root)
+            package = root / "package"
+            with mock.patch.dict(handoff.EXPECTED_COUNTS, {"total_records": 3, "reference_count": 1, "benchmark_count": 1, "verify_count": 1}), \
+                 mock.patch.object(handoff, "BENCHMARK_QUERY_COUNT", 1), \
+                 mock.patch.object(handoff, "VERIFY_QUERY_COUNT", 1), \
+                 mock.patch.object(handoff, "git_commit", lambda repo: "testcommit"):
+                manifest = handoff.create_client_package(source, package, baseline, root, sqlite_cache_kib=0)
+                self.assertEqual(manifest["cache_mode"], "no_sqlite_cache")
+                self.assertEqual(manifest["sqlite_cache_kib"], 0)
+                self.assertEqual(manifest["sqlite_mmap"], 0)
+                self.assertEqual(manifest["os_page_cache"], "warm")
+                self.assertEqual(handoff.verify_package(package), manifest)
+            self.assertIn("--sqlite-cache-kib 0", (package / "README.md").read_text(encoding="utf-8"))
+
     def test_client_rejects_conflicting_overlapping_ids(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

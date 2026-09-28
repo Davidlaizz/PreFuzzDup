@@ -90,6 +90,7 @@ METADATA_METRICS = (
 )
 RESULT_ROWS_PER_SCHEME = BENCHMARK_QUERY_COUNT * REPEAT * len(THRESHOLDS)
 RESULT_KEYS_PER_SCHEME = RESULT_ROWS_PER_SCHEME
+DEFAULT_SQLITE_CACHE_KIB = 1024
 
 
 def fail(message: str) -> None:
@@ -143,6 +144,10 @@ def require_empty_directory(path: Path, label: str) -> None:
     if path.exists() and any(path.iterdir()):
         fail(f"{label} already exists and is not empty: {path}")
     path.mkdir(parents=True, exist_ok=True)
+
+
+def cache_mode(cache_kib: int) -> str:
+    return "no_sqlite_cache" if cache_kib == 0 else "warm_sqlite_cache"
 
 
 def validate_tag_csv(path: Path, expected_count: int) -> list[dict[str, str]]:
@@ -201,19 +206,23 @@ def validate_source_labels(path: Path, query_rows: list[dict[str, str]]) -> dict
     return groups
 
 
-def package_readme(package_name: str) -> str:
+def package_readme(package_name: str, sqlite_cache_kib: int) -> str:
     return f"""# Three-scheme full lookup handoff
 
 This package contains only derived 256-bit SimHash tags and query IDs/groups.
 It does not contain Enron messages, bodies, body hashes, SQLite databases,
 ciphertext, or private keys.
 
+Cache mode: `{cache_mode(sqlite_cache_kib)}` (`--sqlite-cache-kib {sqlite_cache_kib}`).
+The OS page cache is intentionally kept warm and is shared by all schemes.
+
 From a Linux server repository root, run:
 
 ```bash
 python3 tools/lookup-handoff/handoff.py server \\
   --package {package_name} \\
-  --scratch "$HOME/three-scheme-full-scratch"
+  --scratch "$HOME/three-scheme-full-scratch" \\
+  --sqlite-cache-kib {sqlite_cache_kib}
 ```
 
 The command verifies all hashes, builds the three lookup binaries, runs
@@ -246,7 +255,9 @@ def validate_baseline(baseline: Path) -> dict[str, Any]:
     }
 
 
-def create_client_package(source: Path, destination: Path, baseline: Path, repo: Path) -> dict[str, Any]:
+def create_client_package(
+    source: Path, destination: Path, baseline: Path, repo: Path, sqlite_cache_kib: int = DEFAULT_SQLITE_CACHE_KIB
+) -> dict[str, Any]:
     require_empty_directory(destination, "destination")
     reference = validate_tag_csv(source / "reference.csv", EXPECTED_COUNTS["reference_count"])
     benchmark = validate_tag_csv(source / "queries_bench_1000.csv", BENCHMARK_QUERY_COUNT)
@@ -332,13 +343,19 @@ def create_client_package(source: Path, destination: Path, baseline: Path, repo:
             "verify": VERIFY_QUERY_COUNT,
         },
         "expected_result_rows_per_scheme": RESULT_ROWS_PER_SCHEME,
+        "cache_mode": cache_mode(sqlite_cache_kib),
+        "sqlite_cache_kib": sqlite_cache_kib,
+        "sqlite_mmap": 0,
+        "os_page_cache": "warm",
         "expected_outputs": expected_outputs,
         "inputs": input_files,
         "baseline": baseline_inventory,
         "split_summary": split,
     }
     write_json(destination / "handoff-manifest.json", manifest)
-    (destination / "README.md").write_text(package_readme(destination.as_posix().replace("\\", "/")), encoding="utf-8", newline="\n")
+    (destination / "README.md").write_text(
+        package_readme(f"handoff/{destination.name}", sqlite_cache_kib), encoding="utf-8", newline="\n"
+    )
     return manifest
 
 
@@ -355,6 +372,13 @@ def verify_package(package: Path) -> dict[str, Any]:
         fail("handoff thresholds must be [4, 5, 6]")
     if manifest.get("repeat") != REPEAT or manifest.get("fpp") != FPP or manifest.get("tag_bits") != TAG_BITS:
         fail("handoff fixed parameters do not match")
+    sqlite_cache_kib = manifest.get("sqlite_cache_kib")
+    if not isinstance(sqlite_cache_kib, int) or sqlite_cache_kib < 0:
+        fail("handoff sqlite_cache_kib must be a non-negative integer")
+    if manifest.get("cache_mode") != cache_mode(sqlite_cache_kib):
+        fail("handoff cache_mode does not match sqlite_cache_kib")
+    if manifest.get("sqlite_mmap") != 0 or manifest.get("os_page_cache") != "warm":
+        fail("handoff cache-control contract must disable mmap and keep the OS page cache warm")
 
     recorded = manifest.get("inputs")
     if not isinstance(recorded, dict) or set(recorded) != set(INPUT_FILES):
@@ -472,6 +496,7 @@ def comparative_command(
     database: Path,
     output: Path,
     repeat: int,
+    sqlite_cache_kib: int,
 ) -> list[str]:
     return [
         binary.as_posix(),
@@ -491,6 +516,8 @@ def comparative_command(
         database.as_posix(),
         "--out",
         output.as_posix(),
+        "--sqlite-cache-kib",
+        str(sqlite_cache_kib),
     ]
 
 
@@ -503,6 +530,7 @@ def prefuzz_command(
     threshold: int,
     repeat: int,
     verify: bool = False,
+    sqlite_cache_kib: int = DEFAULT_SQLITE_CACHE_KIB,
 ) -> list[str]:
     command = [
         binary.as_posix(),
@@ -523,6 +551,7 @@ def prefuzz_command(
         "--repeat",
         str(repeat),
     ]
+    command.extend(["--sqlite-cache-kib", str(sqlite_cache_kib)])
     if verify:
         command.append("--verify-equivalence")
     command.extend(["--out", output.as_posix()])
@@ -925,6 +954,8 @@ def analyze_results(package: Path, baseline: Path, output: Path) -> bool:
         "# Three-scheme full handoff analysis",
         "",
         f"- Scale: `{handoff_manifest.get('scale')}`",
+        f"- Cache mode: `{handoff_manifest.get('cache_mode')}`",
+        f"- SQLite cache KiB: `{handoff_manifest.get('sqlite_cache_kib')}`",
         f"- Unique result keys per scheme: `{RESULT_KEYS_PER_SCHEME}`",
         f"- Workload disagreements: `{workload_disagreements}`",
         f"- Server/baseline matched disagreements: `{matched_disagreements}`",
@@ -934,7 +965,8 @@ def analyze_results(package: Path, baseline: Path, output: Path) -> bool:
         f"- Verification: `{server_manifest.get('status')}`",
         "",
         "Git transfer time was not measured. OS page cache was not cleared.",
-        "SQLite application cache was approximately 1 MiB. Commands ran in a fixed order.",
+        f"SQLite page cache used --sqlite-cache-kib {handoff_manifest.get('sqlite_cache_kib')}.",
+        "Commands ran in a fixed order.",
         "PreFuzzDup returns all candidates, SimLESS finds the global minimum distance,",
         "and FuzzyDedup returns at its first match; latency is descriptive only.",
     ]
@@ -956,11 +988,13 @@ def parse_arguments() -> argparse.Namespace:
     client.add_argument("--baseline", type=Path, required=True)
     client.add_argument("--dest", type=Path, required=True)
     client.add_argument("--repo", type=Path, default=repo)
+    client.add_argument("--sqlite-cache-kib", type=int, default=DEFAULT_SQLITE_CACHE_KIB)
 
     server = subparsers.add_parser("server", help="verify and execute a handoff package")
     server.add_argument("--package", type=Path, required=True)
     server.add_argument("--scratch", type=Path, required=True)
     server.add_argument("--repo", type=Path, default=repo)
+    server.add_argument("--sqlite-cache-kib", type=int, required=True)
 
     analyze = subparsers.add_parser("analyze", help="compare server results with the local full baseline")
     analyze.add_argument("--package", type=Path, required=True)
@@ -972,6 +1006,8 @@ def parse_arguments() -> argparse.Namespace:
 def main() -> int:
     arguments = parse_arguments()
     try:
+        if arguments.command in {"client", "server"} and arguments.sqlite_cache_kib < 0:
+            fail("--sqlite-cache-kib must be a non-negative integer")
         if arguments.command == "client":
             if arguments.scale != SCALE:
                 fail(f"unsupported scale: {arguments.scale}")
@@ -980,11 +1016,17 @@ def main() -> int:
                 arguments.dest.resolve(),
                 arguments.baseline.resolve(),
                 arguments.repo.resolve(),
+                arguments.sqlite_cache_kib,
             )
             print(f"handoff package complete: {arguments.dest}")
             print(f"source git commit: {manifest['source_git_commit']}")
         elif arguments.command == "server":
-            run_server(arguments.package.resolve(), arguments.scratch.resolve(), arguments.repo.resolve())
+            run_server(
+                arguments.package.resolve(),
+                arguments.scratch.resolve(),
+                arguments.repo.resolve(),
+                arguments.sqlite_cache_kib,
+            )
             print("server handoff complete")
         else:
             passed = analyze_results(
@@ -1034,8 +1076,10 @@ def check_cross_scheme(
         fail(f"cross-scheme matched disagreements: {len(disagreements)}; sample: {sample}")
 
 
-def run_server(package: Path, scratch: Path, repo: Path) -> None:
+def run_server(package: Path, scratch: Path, repo: Path, sqlite_cache_kib: int) -> None:
     manifest = verify_package(package)
+    if sqlite_cache_kib != manifest.get("sqlite_cache_kib"):
+        fail("server sqlite_cache_kib differs from handoff manifest")
     results = package / "results"
     require_empty_directory(results, "results")
     logs = results / "logs"
@@ -1072,6 +1116,7 @@ def run_server(package: Path, scratch: Path, repo: Path) -> None:
             threshold=6,
             repeat=1,
             verify=True,
+            sqlite_cache_kib=sqlite_cache_kib,
         )
         completed = run_logged(logs / "prefuzzdup-verify.log", verify_command, repo, "prefuzzdup_verify", commands)
         if "equivalence_check=passed" not in completed.stdout:
@@ -1089,6 +1134,7 @@ def run_server(package: Path, scratch: Path, repo: Path) -> None:
                 output,
                 threshold=threshold,
                 repeat=REPEAT,
+                sqlite_cache_kib=sqlite_cache_kib,
             )
             completed = run_logged(logs / f"prefuzzdup-t{threshold}.log", command, repo, f"prefuzzdup_t{threshold}", commands)
             metadata[str(threshold)] = parse_prefuzz_metadata(completed.stdout)
@@ -1103,6 +1149,7 @@ def run_server(package: Path, scratch: Path, repo: Path) -> None:
             scratch / "simless_verify.sqlite",
             results / "simless_verify.csv",
             repeat=1,
+            sqlite_cache_kib=sqlite_cache_kib,
         )
         run_logged(logs / "simless-verify.log", simless_verify, repo, "simless_verify", commands)
         validate_comparative_csv(
@@ -1124,6 +1171,7 @@ def run_server(package: Path, scratch: Path, repo: Path) -> None:
             scratch / "simless_bench.sqlite",
             results / "simless_bench.csv",
             repeat=REPEAT,
+            sqlite_cache_kib=sqlite_cache_kib,
         )
         run_logged(logs / "simless-bench.log", simless_bench, repo, "simless_bench", commands)
         simless_rows = validate_comparative_csv(
@@ -1145,6 +1193,7 @@ def run_server(package: Path, scratch: Path, repo: Path) -> None:
             scratch / "fuzzydedup_verify.sqlite",
             results / "fuzzydedup_verify.csv",
             repeat=1,
+            sqlite_cache_kib=sqlite_cache_kib,
         )
         run_logged(logs / "fuzzydedup-verify.log", fuzzydedup_verify, repo, "fuzzydedup_verify", commands)
         validate_comparative_csv(
@@ -1166,6 +1215,7 @@ def run_server(package: Path, scratch: Path, repo: Path) -> None:
             scratch / "fuzzydedup_bench.sqlite",
             results / "fuzzydedup_bench.csv",
             repeat=REPEAT,
+            sqlite_cache_kib=sqlite_cache_kib,
         )
         run_logged(logs / "fuzzydedup-bench.log", fuzzydedup_bench, repo, "fuzzydedup_bench", commands)
         fuzzydedup_rows = validate_comparative_csv(
@@ -1207,6 +1257,10 @@ def run_server(package: Path, scratch: Path, repo: Path) -> None:
             "server_git_commit": git_commit(repo),
             "thresholds": list(THRESHOLDS),
             "repeat": REPEAT,
+            "cache_mode": cache_mode(sqlite_cache_kib),
+            "sqlite_cache_kib": sqlite_cache_kib,
+            "sqlite_mmap": 0,
+            "os_page_cache_cleared": False,
             "expected_result_rows_per_scheme": RESULT_ROWS_PER_SCHEME,
             "prefuzz_metadata": metadata,
             "database_files": database_files,
@@ -1215,7 +1269,7 @@ def run_server(package: Path, scratch: Path, repo: Path) -> None:
             "notes": [
                 "Git transfer time was not measured.",
                 "OS page cache was not cleared.",
-                "SQLite application page cache is approximately 1 MiB.",
+                f"SQLite page cache was configured with --sqlite-cache-kib {sqlite_cache_kib}.",
                 "Commands ran in the fixed order recorded in commands.",
                 "Latency differences are descriptive; workload equality is required.",
             ],
