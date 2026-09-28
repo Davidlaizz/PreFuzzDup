@@ -115,8 +115,8 @@ class SqliteDb {
 
 class PersistentIndex {
  public:
-  PersistentIndex(std::vector<Item> records, std::size_t bits, std::unordered_map<std::string, TypeParameters> params, TypeParameters defaults, double fpp, const std::string& db_path, const std::string& signature)
-      : records_(std::move(records)), bits_(bits), params_(std::move(params)), defaults_(defaults), fpp_(fpp), db_(db_path) { build(signature); }
+  PersistentIndex(std::vector<Item> records, std::size_t bits, std::unordered_map<std::string, TypeParameters> params, TypeParameters defaults, double fpp, const std::string& db_path, const std::string& signature, std::size_t sqlite_cache_kib)
+      : records_(std::move(records)), bits_(bits), params_(std::move(params)), defaults_(defaults), fpp_(fpp), sqlite_cache_kib_(sqlite_cache_kib), db_(db_path) { build(signature); }
   QueryResult scan(const Item& query) const { QueryResult result; for (auto id : ids_for_type(query.type)) { ++result.metrics.full_tag_distance_computations; if (hamming_distance(query.tag, db_.read_tag(id, bits_)) <= params_for(query.type).delta) result.candidates.push_back(id); } sort(result.candidates); return result; }
   QueryResult exact(const Item& query) const { return indexed(query, false); }
   QueryResult prefuzz(const Item& query) const { return indexed(query, true); }
@@ -157,6 +157,10 @@ class PersistentIndex {
     rebuild_filters();
     // Keep only record IDs/types for result ordering. Full tags live in SQLite.
     for (auto& record : records_) std::vector<std::uint8_t>().swap(record.tag.bytes);
+    const std::string cache_pragma = sqlite_cache_kib_ == 0
+        ? "PRAGMA cache_size=0; PRAGMA mmap_size=0; PRAGMA shrink_memory;"
+        : "PRAGMA cache_size=-" + std::to_string(sqlite_cache_kib_) + "; PRAGMA mmap_size=0;";
+    db_.exec(cache_pragma.c_str());
     db_.prepare_lookup();
   }
   void rebuild_disk_index(const std::string& signature) {
@@ -229,7 +233,7 @@ class PersistentIndex {
     sort(result.candidates); return result;
   }
   void sort(std::vector<std::size_t>& ids) const { std::sort(ids.begin(), ids.end(), [this](auto left, auto right) { return records_[left].id < records_[right].id; }); }
-  std::vector<Item> records_; std::size_t bits_; std::unordered_map<std::string, TypeParameters> params_; TypeParameters defaults_; double fpp_; std::unordered_map<std::string, std::vector<std::size_t>> by_type_; std::unordered_map<std::string, PrefixFilter> filters_; mutable SqliteDb db_; bool reused_disk_index_ = false;
+  std::vector<Item> records_; std::size_t bits_; std::unordered_map<std::string, TypeParameters> params_; TypeParameters defaults_; double fpp_; std::size_t sqlite_cache_kib_; std::unordered_map<std::string, std::vector<std::size_t>> by_type_; std::unordered_map<std::string, PrefixFilter> filters_; mutable SqliteDb db_; bool reused_disk_index_ = false;
 };
 
 enum class Strategy { scan, exact, prefuzz };
@@ -237,22 +241,43 @@ std::string name(Strategy strategy) { return strategy == Strategy::scan ? "scan"
 std::vector<Strategy> parse_strategies(const std::string& text) { std::vector<Strategy> result; for (const auto& value : split(text, ',')) { if (value == "scan") result.push_back(Strategy::scan); else if (value == "exact") result.push_back(Strategy::exact); else if (value == "prefuzz") result.push_back(Strategy::prefuzz); else fail("不支持的策略：" + value); } return result; }
 std::unordered_map<std::string, TypeParameters> parse_thresholds(const std::string& text, TypeParameters& defaults) { std::unordered_map<std::string, TypeParameters> result; bool got_default = false; for (const auto& entry : split(text, ',')) { const auto position = entry.find('='); if (position == std::string::npos) fail("--threshold 格式错误。"); const auto key = trim(entry.substr(0, position)), value = trim(entry.substr(position + 1)); std::uint32_t delta = 0; const auto converted = std::from_chars(value.data(), value.data() + value.size(), delta); if (converted.ec != std::errc{} || converted.ptr != value.data() + value.size()) fail("阈值必须为非负整数。"); if (key == "default") { defaults = {delta}; got_default = true; } else result[key] = {delta}; } if (!got_default) fail("--threshold 必须包含 default=值。"); return result; }
 
-struct Options { std::string records, queries, db, output, threshold, strategies = "scan,exact,prefuzz"; std::size_t bits = 0, repeat = 1; double fpp = .01; bool verify = false; };
-void usage() { std::cout << "用法：prefuzzdup_persistent_retrieval --records records.csv --queries queries.csv --db index.sqlite --tag-bits 256 --threshold default=6 [--fpp 0.01] [--strategies scan,exact,prefuzz] [--repeat 3] [--verify-equivalence] [--out result.csv]\n"; }
+struct Options { std::string records, queries, db, output, threshold, strategies = "scan,exact,prefuzz"; std::size_t bits = 0, repeat = 1, sqlite_cache_kib = 1024; double fpp = .01; bool verify = false; };
+void usage() { std::cout << "用法：prefuzzdup_persistent_retrieval --records records.csv --queries queries.csv --db index.sqlite --tag-bits 256 --threshold default=6 [--fpp 0.01] [--strategies scan,exact,prefuzz] [--repeat 3] [--sqlite-cache-kib 1024] [--verify-equivalence] [--out result.csv]\n"; }
 Options parse_options(int argc, char** argv) { Options options; for (int i = 1; i < argc; ++i) { const std::string key = argv[i]; if (key == "--help" || key == "-h") { usage(); std::exit(0); } if (key == "--verify-equivalence") { options.verify = true; continue; } if (i + 1 >= argc) fail("参数缺少值：" + key); const std::string value = argv[++i]; if (key == "--records") options.records = value; else if (key == "--queries") options.queries = value; else if (key == "--db") options.db = value; else if (key == "--out") options.output = value; else if (key == "--threshold") options.threshold = value; else if (key == "--strategies") options.strategies = value; else if (key == "--tag-bits") { const auto c = std::from_chars(value.data(), value.data() + value.size(), options.bits); if (c.ec != std::errc{}) fail("--tag-bits 必须为整数。"); } else if (key == "--repeat") { const auto c = std::from_chars(value.data(), value.data() + value.size(), options.repeat); if (c.ec != std::errc{} || options.repeat == 0) fail("--repeat 必须为正整数。"); } else if (key == "--fpp") { char* end = nullptr; options.fpp = std::strtod(value.c_str(), &end); if (end == value.c_str() || *end) fail("--fpp 必须为小数。"); } else fail("未知参数：" + key); } if (options.records.empty() || options.queries.empty() || options.db.empty() || options.threshold.empty() || options.bits == 0) { usage(); fail("缺少必要参数。"); } return options; }
 QueryResult run(const PersistentIndex& index, const Item& query, Strategy strategy) { return strategy == Strategy::scan ? index.scan(query) : strategy == Strategy::exact ? index.exact(query) : index.prefuzz(query); }
+Options parse_options_with_sqlite_cache(int argc, char** argv) {
+  std::vector<char*> legacy_argv{argv[0]};
+  for (int i = 1; i < argc; ++i) {
+    const std::string key = argv[i];
+    if (key == "--sqlite-cache-kib") {
+      if (i + 1 >= argc) fail("参数缺少值：" + key);
+      ++i;
+      continue;
+    }
+    legacy_argv.push_back(argv[i]);
+  }
+  auto options = parse_options(static_cast<int>(legacy_argv.size()), legacy_argv.data());
+  for (int i = 1; i < argc; ++i) {
+    const std::string key = argv[i];
+    if (key != "--sqlite-cache-kib") continue;
+    const std::string value = argv[++i];
+    const auto converted = std::from_chars(value.data(), value.data() + value.size(), options.sqlite_cache_kib);
+    if (converted.ec != std::errc{} || converted.ptr != value.data() + value.size()) fail("--sqlite-cache-kib 必须为非负整数。");
+  }
+  return options;
+}
 double p95(std::vector<double> values) { std::sort(values.begin(), values.end()); return values[static_cast<std::size_t>(std::ceil(values.size() * .95)) - 1]; }
 
 int main(int argc, char** argv) {
   try {
-    const auto options = parse_options(argc, argv); TypeParameters defaults; const auto parameters = parse_thresholds(options.threshold, defaults); auto records = load_manifest(options.records, options.bits); const auto queries = load_manifest(options.queries, options.bits); const auto strategies = parse_strategies(options.strategies);
+    const auto options = parse_options_with_sqlite_cache(argc, argv); TypeParameters defaults; const auto parameters = parse_thresholds(options.threshold, defaults); auto records = load_manifest(options.records, options.bits); const auto queries = load_manifest(options.queries, options.bits); const auto strategies = parse_strategies(options.strategies);
     const auto signature = manifest_digest(options.records, options.bits, options.threshold);
-    const auto start = std::chrono::steady_clock::now(); PersistentIndex index(std::move(records), options.bits, parameters, defaults, options.fpp, options.db, signature); const auto build_us = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start).count();
+    const auto start = std::chrono::steady_clock::now(); PersistentIndex index(std::move(records), options.bits, parameters, defaults, options.fpp, options.db, signature, options.sqlite_cache_kib); const auto build_us = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start).count();
     if (options.verify) for (const auto& query : queries) { const auto expected = index.scan(query).candidates; if (index.exact(query).candidates != expected || index.prefuzz(query).candidates != expected) fail("持久化检索与全量扫描候选集合不一致：" + query.id); }
     if (options.verify) std::cout << "equivalence_check=passed (not included in latency measurement)\n";
     std::ofstream file; std::ostream* out = &std::cout; if (!options.output.empty()) { file.open(options.output); if (!file) fail("无法写入输出文件。"); out = &file; }
     *out << "strategy,query_id,type,repeat,latency_us,candidate_count,filter_queries,inverted_lookups,posting_records_read,full_tag_distance_computations\n";
-    std::cout << "records=" << index.records() << ", tag_bits=" << options.bits << ", index_prepare_us=" << build_us << ", disk_index_reused=" << (index.reused_disk_index() ? 1 : 0) << ", filter_bytes_estimate=" << index.filters_bytes() << ", sqlite_cache_kib=1024\n";
+    std::cout << "records=" << index.records() << ", tag_bits=" << options.bits << ", index_prepare_us=" << build_us << ", disk_index_reused=" << (index.reused_disk_index() ? 1 : 0) << ", filter_bytes_estimate=" << index.filters_bytes() << ", sqlite_cache_kib=" << options.sqlite_cache_kib << ", sqlite_mmap=0\n";
     for (const auto strategy : strategies) { std::vector<double> latencies; Metrics total; std::uint64_t candidates = 0; for (std::size_t repeat = 0; repeat < options.repeat; ++repeat) for (const auto& query : queries) { const auto now = std::chrono::steady_clock::now(); const auto result = run(index, query, strategy); const auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - now).count(); latencies.push_back(elapsed); total.filter_queries += result.metrics.filter_queries; total.inverted_lookups += result.metrics.inverted_lookups; total.posting_records_read += result.metrics.posting_records_read; total.full_tag_distance_computations += result.metrics.full_tag_distance_computations; candidates += result.candidates.size(); *out << name(strategy) << ',' << query.id << ',' << query.type << ',' << repeat << ',' << elapsed << ',' << result.candidates.size() << ',' << result.metrics.filter_queries << ',' << result.metrics.inverted_lookups << ',' << result.metrics.posting_records_read << ',' << result.metrics.full_tag_distance_computations << '\n'; } const auto n = static_cast<double>(latencies.size()); std::cout << name(strategy) << ": queries=" << latencies.size() << ", mean_us=" << std::fixed << std::setprecision(2) << std::accumulate(latencies.begin(), latencies.end(), 0.0) / n << ", p95_us=" << p95(latencies) << ", mean_candidates=" << candidates / n << ", mean_distance_computations=" << total.full_tag_distance_computations / n << ", mean_filter_queries=" << total.filter_queries / n << ", mean_inverted_lookups=" << total.inverted_lookups / n << ", mean_posting_records_read=" << total.posting_records_read / n << '\n'; }
     return 0;
   } catch (const std::exception& error) { std::cerr << "错误：" << error.what() << '\n'; return 1; }

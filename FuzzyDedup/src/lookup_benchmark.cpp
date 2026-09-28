@@ -236,7 +236,7 @@ class FuzzyDedupLookup {
 
 class PersistentLabelTable {
  public:
-  PersistentLabelTable(const std::string& path, const std::vector<Item>& records) {
+  PersistentLabelTable(const std::string& path, const std::vector<Item>& records, std::size_t sqlite_cache_kib) {
     if (sqlite3_open_v2(path.c_str(), &db_, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr) != SQLITE_OK) {
       fail("cannot open SQLite label table: " + path);
     }
@@ -275,6 +275,10 @@ class PersistentLabelTable {
       throw;
     }
     sqlite3_finalize(insert);
+    const std::string cache_pragma = sqlite_cache_kib == 0
+        ? "PRAGMA cache_size=0; PRAGMA mmap_size=0; PRAGMA shrink_memory;"
+        : "PRAGMA cache_size=-" + std::to_string(sqlite_cache_kib) + "; PRAGMA mmap_size=0;";
+    exec(cache_pragma.c_str());
     if (sqlite3_prepare_v2(db_, "SELECT tags FROM label_blocks WHERE kind='all' AND weight=0", -1, &scan_, nullptr) != SQLITE_OK) fail("cannot prepare label scan");
     if (sqlite3_prepare_v2(db_, "SELECT tags FROM label_blocks WHERE kind='weight' AND weight BETWEEN ?1 AND ?2 ORDER BY weight", -1, &weight_query_, nullptr) != SQLITE_OK) fail("cannot prepare Hamming-weight query");
   }
@@ -309,7 +313,7 @@ class PersistentLabelTable {
 
 class PersistentSimLESSLookup {
  public:
-  PersistentSimLESSLookup(const std::string& path, const std::vector<Item>& records) : labels_(path, records) {}
+  PersistentSimLESSLookup(const std::string& path, const std::vector<Item>& records, std::size_t sqlite_cache_kib) : labels_(path, records, sqlite_cache_kib) {}
   Result query(const Query& query, std::uint16_t threshold) const {
     const auto start = std::chrono::steady_clock::now();
     auto* statement = labels_.scan_statement();
@@ -337,7 +341,7 @@ class PersistentSimLESSLookup {
 
 class PersistentFuzzyDedupLookup {
  public:
-  PersistentFuzzyDedupLookup(const std::string& path, const std::vector<Item>& records) : labels_(path, records) {}
+  PersistentFuzzyDedupLookup(const std::string& path, const std::vector<Item>& records, std::size_t sqlite_cache_kib) : labels_(path, records, sqlite_cache_kib) {}
   Result query(const Query& query, std::uint16_t threshold) const {
     const auto start = std::chrono::steady_clock::now();
     const auto query_weight = static_cast<int>(weight(query.tag));
@@ -377,6 +381,7 @@ struct Options {
   std::string records, queries, labels, output, scheme, database;
   std::vector<int> thresholds;
   int repeat = 2;
+  std::size_t sqlite_cache_kib = 1024;
 };
 
 std::vector<int> parse_threshold_list(const std::string& text) {
@@ -411,6 +416,10 @@ Options parse_options(int argc, char** argv) {
     else if (key == "--labels") options.labels = value;
     else if (key == "--threshold" || key == "--thresholds") options.thresholds = parse_threshold_list(value);
     else if (key == "--repeat") options.repeat = std::stoi(value);
+    else if (key == "--sqlite-cache-kib") {
+      const auto converted = std::from_chars(value.data(), value.data() + value.size(), options.sqlite_cache_kib);
+      if (converted.ec != std::errc{} || converted.ptr != value.data() + value.size()) fail("sqlite cache size must be a non-negative integer");
+    }
     else if (key == "--out") options.output = value;
     else if (key == "--db") options.database = value;
     else fail("unknown option: " + key);
@@ -427,6 +436,7 @@ void execute(const Options& options, const Lookup& lookup, const std::vector<Que
   std::ofstream output(options.output);
   if (!output) fail("cannot write output: " + options.output);
   output << "scheme,threshold,repeat,query_id,group,latency_us,matched,best_distance,records_examined,bits_compared\n";
+  std::cout << options.scheme << " sqlite_cache_kib=" << options.sqlite_cache_kib << " sqlite_mmap=0\n";
   std::map<std::pair<int, std::string>, std::pair<double, std::uint64_t>> summary;
   for (int repeat = 0; repeat < options.repeat; ++repeat) {
     for (std::size_t query_index = 0; query_index < queries.size(); ++query_index) {
@@ -467,8 +477,8 @@ int main(int argc, char** argv) {
     const auto options = benchmark::parse_options(argc, argv);
     const auto records = benchmark::load_records(options.records);
     const auto queries = benchmark::load_queries(options.queries, options.labels);
-    if (options.scheme == "simless") benchmark::execute(options, benchmark::PersistentSimLESSLookup(options.database, records), queries);
-    else benchmark::execute(options, benchmark::PersistentFuzzyDedupLookup(options.database, records), queries);
+    if (options.scheme == "simless") benchmark::execute(options, benchmark::PersistentSimLESSLookup(options.database, records, options.sqlite_cache_kib), queries);
+    else benchmark::execute(options, benchmark::PersistentFuzzyDedupLookup(options.database, records, options.sqlite_cache_kib), queries);
     return 0;
   } catch (const std::exception& error) {
     std::cerr << "error: " << error.what() << '\n';
