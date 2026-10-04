@@ -44,6 +44,10 @@ struct Result {
   std::uint64_t records_examined{};
   std::uint64_t bits_compared{};
   double latency_us{};
+  // Ordered candidate list for the unified nearest/all protocol. Each entry
+  // is (dataset record id, Hamming distance). Sorted by ascending distance,
+  // then by ascending record id for a deterministic tie-break.
+  std::vector<std::pair<std::string, std::uint16_t>> candidates;
 };
 
 [[noreturn]] void fail(const std::string& message) { throw std::runtime_error(message); }
@@ -240,6 +244,8 @@ class PersistentLabelTable {
     if (sqlite3_open_v2(path.c_str(), &db_, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr) != SQLITE_OK) {
       fail("cannot open SQLite label table: " + path);
     }
+    record_ids_.reserve(records.size());
+    for (const auto& record : records) record_ids_.push_back(record.id);
     exec("PRAGMA journal_mode=OFF; PRAGMA synchronous=OFF; PRAGMA temp_store=FILE; PRAGMA cache_size=-1024;");
     exec("DROP TABLE IF EXISTS label_blocks;");
     exec("CREATE TABLE label_blocks(kind TEXT NOT NULL, weight INTEGER NOT NULL, tags BLOB NOT NULL, PRIMARY KEY(kind,weight)) WITHOUT ROWID;");
@@ -292,6 +298,7 @@ class PersistentLabelTable {
 
   sqlite3_stmt* scan_statement() const { return scan_; }
   sqlite3_stmt* weight_statement() const { return weight_query_; }
+  const std::string& record_id(std::size_t position) const { return record_ids_.at(position); }
   static void reset(sqlite3_stmt* statement) {
     sqlite3_reset(statement);
     sqlite3_clear_bindings(statement);
@@ -309,31 +316,39 @@ class PersistentLabelTable {
   sqlite3* db_{};
   sqlite3_stmt* scan_{};
   sqlite3_stmt* weight_query_{};
+  std::vector<std::string> record_ids_;
 };
 
 class PersistentSimLESSLookup {
  public:
   PersistentSimLESSLookup(const std::string& path, const std::vector<Item>& records, std::size_t sqlite_cache_kib) : labels_(path, records, sqlite_cache_kib) {}
-  Result query(const Query& query, std::uint16_t threshold) const {
+  Result query(const Query& query, std::uint16_t threshold, bool all_mode) const {
     const auto start = std::chrono::steady_clock::now();
     auto* statement = labels_.scan_statement();
     std::uint16_t minimum = 257;
     std::uint64_t examined = 0;
+    std::vector<std::pair<std::string, std::uint16_t>> candidates;
     int status = SQLITE_OK;
     while ((status = sqlite3_step(statement)) == SQLITE_ROW) {
       const auto* bytes = static_cast<const std::uint8_t*>(sqlite3_column_blob(statement, 0));
       const int size = sqlite3_column_bytes(statement, 0);
       if (bytes == nullptr || size % 32 != 0) fail("invalid SimLESS tag block");
       for (int offset = 0; offset < size; offset += 32) {
-        minimum = std::min(minimum, full_distance(query.tag, tag_from_bytes(bytes + offset)));
+        const auto distance = full_distance(query.tag, tag_from_bytes(bytes + offset));
+        if (distance <= threshold) candidates.emplace_back(labels_.record_id(examined), distance);
+        minimum = std::min(minimum, distance);
         ++examined;
       }
     }
     PersistentLabelTable::reset(statement);
     if (status != SQLITE_DONE) fail("persistent SimLESS scan failed");
+    std::sort(candidates.begin(), candidates.end(), [](const auto& a, const auto& b) {
+      return a.second != b.second ? a.second < b.second : a.first < b.first;
+    });
+    if (!all_mode && !candidates.empty()) candidates.resize(1);
     const auto stop = std::chrono::steady_clock::now();
     return {minimum <= threshold, minimum, examined, examined * 256ULL,
-            std::chrono::duration<double, std::micro>(stop - start).count()};
+            std::chrono::duration<double, std::micro>(stop - start).count(), std::move(candidates)};
   }
  private:
   PersistentLabelTable labels_;
@@ -341,40 +356,45 @@ class PersistentSimLESSLookup {
 
 class PersistentFuzzyDedupLookup {
  public:
-  PersistentFuzzyDedupLookup(const std::string& path, const std::vector<Item>& records, std::size_t sqlite_cache_kib) : labels_(path, records, sqlite_cache_kib) {}
-  Result query(const Query& query, std::uint16_t threshold) const {
+  PersistentFuzzyDedupLookup(const std::string& path, const std::vector<Item>& records, std::size_t sqlite_cache_kib) : labels_(path, records, sqlite_cache_kib) {
+    sorted_records_ = records;
+    std::sort(sorted_records_.begin(), sorted_records_.end(), [](const Item& a, const Item& b) {
+      return a.weight < b.weight;
+    });
+  }
+  Result query(const Query& query, std::uint16_t threshold, bool all_mode) const {
     const auto start = std::chrono::steady_clock::now();
     const auto query_weight = static_cast<int>(weight(query.tag));
-    auto* statement = labels_.weight_statement();
-    sqlite3_bind_int(statement, 1, std::max(0, query_weight - static_cast<int>(threshold)));
-    sqlite3_bind_int(statement, 2, std::min(256, query_weight + static_cast<int>(threshold)));
     std::uint64_t examined = 0, bits = 0;
     std::uint16_t minimum = 257;
-    int status = SQLITE_OK;
-    while ((status = sqlite3_step(statement)) == SQLITE_ROW) {
-      const auto* bytes = static_cast<const std::uint8_t*>(sqlite3_column_blob(statement, 0));
-      const int size = sqlite3_column_bytes(statement, 0);
-      if (bytes == nullptr || size % 32 != 0) fail("invalid FuzzyDedup tag block");
-      for (int offset = 0; offset < size; offset += 32) {
-        const auto tag = tag_from_bytes(bytes + offset);
-        ++examined;
-        const auto [distance, compared] = three_cut_distance(query.tag, tag, threshold);
-        bits += compared;
-        minimum = std::min(minimum, distance);
-        if (distance <= threshold) {
-          PersistentLabelTable::reset(statement);
-          const auto stop = std::chrono::steady_clock::now();
-          return {true, distance, examined, bits, std::chrono::duration<double, std::micro>(stop - start).count()};
-        }
+    std::vector<std::pair<std::string, std::uint16_t>> candidates;
+    const auto lower = std::lower_bound(sorted_records_.begin(), sorted_records_.end(),
+                                        std::max(0, query_weight - static_cast<int>(threshold)),
+                                        [](const Item& item, int value) { return item.weight < value; });
+    const auto upper = std::upper_bound(sorted_records_.begin(), sorted_records_.end(),
+                                        std::min(256, query_weight + static_cast<int>(threshold)),
+                                        [](int value, const Item& item) { return value < item.weight; });
+    for (auto it = lower; it != upper; ++it) {
+      ++examined;
+      const auto [distance, compared] = three_cut_distance(query.tag, it->tag, threshold);
+      bits += compared;
+      if (distance <= threshold) {
+        const auto exact = full_distance(query.tag, it->tag);
+        minimum = std::min(minimum, exact);
+        candidates.emplace_back(it->id, exact);
       }
     }
-    PersistentLabelTable::reset(statement);
-    if (status != SQLITE_DONE) fail("persistent FuzzyDedup query failed");
+    std::sort(candidates.begin(), candidates.end(), [](const auto& a, const auto& b) {
+      return a.second != b.second ? a.second < b.second : a.first < b.first;
+    });
+    if (!all_mode && !candidates.empty()) candidates.resize(1);
     const auto stop = std::chrono::steady_clock::now();
-    return {false, minimum, examined, bits, std::chrono::duration<double, std::micro>(stop - start).count()};
+    return {minimum <= threshold, minimum, examined, bits,
+            std::chrono::duration<double, std::micro>(stop - start).count(), std::move(candidates)};
   }
  private:
   PersistentLabelTable labels_;
+  std::vector<Item> sorted_records_;
 };
 
 struct Options {
@@ -382,6 +402,9 @@ struct Options {
   std::vector<int> thresholds;
   int repeat = 2;
   std::size_t sqlite_cache_kib = 1024;
+  // Unified retrieval mode: "all" returns every candidate within threshold
+  // ordered by (distance, record_id); "nearest" returns only the closest one.
+  std::string mode = "all";
 };
 
 std::vector<int> parse_threshold_list(const std::string& text) {
@@ -422,8 +445,10 @@ Options parse_options(int argc, char** argv) {
     }
     else if (key == "--out") options.output = value;
     else if (key == "--db") options.database = value;
+    else if (key == "--mode") options.mode = value;
     else fail("unknown option: " + key);
   }
+  if (options.mode != "all" && options.mode != "nearest") fail("--mode must be all or nearest");
   if (options.records.empty() || options.queries.empty() || options.labels.empty() || options.output.empty() ||
       (options.scheme != "simless" && options.scheme != "fuzzydedup") || options.database.empty() || options.thresholds.empty() || options.repeat <= 0) {
     fail("missing or invalid required options");
@@ -446,18 +471,22 @@ void execute(const Options& options, const Lookup& lookup, const std::vector<Que
       // Measure that scan once and reuse the same measured lookup for each
       // threshold so thermal drift cannot masquerade as a threshold effect.
       std::optional<Result> shared_simless_result;
-      if (options.scheme == "simless" && options.thresholds.size() > 1) {
-        shared_simless_result = lookup.query(query, 0);
+      if (options.scheme == "simless" && options.thresholds.size() > 1 && options.mode == "all") {
+        shared_simless_result = lookup.query(query, 0, options.mode == "all");
       }
       // Rotate the threshold order so a threshold is not tied to one thermal state.
       for (std::size_t offset = 0; offset < options.thresholds.size(); ++offset) {
         const int threshold = options.thresholds[(query_index + static_cast<std::size_t>(repeat) + offset) % options.thresholds.size()];
         auto result = shared_simless_result ? *shared_simless_result
-                                            : lookup.query(query, static_cast<std::uint16_t>(threshold));
+                                            : lookup.query(query, static_cast<std::uint16_t>(threshold), options.mode == "all");
         result.matched = result.best_distance <= threshold;
         output << options.scheme << ',' << threshold << ',' << repeat << ',' << query.id << ',' << query.group << ','
                << std::fixed << std::setprecision(3) << result.latency_us << ',' << (result.matched ? 1 : 0) << ','
-               << result.best_distance << ',' << result.records_examined << ',' << result.bits_compared << '\n';
+               << result.best_distance << ',' << result.records_examined << ',' << result.bits_compared;
+        for (const auto& [record_id, distance] : result.candidates) {
+          output << ',' << record_id << ':' << distance;
+        }
+        output << '\n';
         auto& [sum, count] = summary[{threshold, query.group}];
         sum += result.latency_us;
         ++count;
