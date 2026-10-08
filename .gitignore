@@ -26,6 +26,9 @@ Thumbs.db
 *.db
 *.db-*
 blobs/
+# User-authorized experiment ciphertext, limited to this import package.
+!/handoff/20261008-prefuzzdup-cipher-import/artifacts/blobs/
+!/handoff/20261008-prefuzzdup-cipher-import/artifacts/blobs/*.bin
 runtime/
 results-local/
 

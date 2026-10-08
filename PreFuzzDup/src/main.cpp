@@ -331,7 +331,8 @@ struct Challenge { Bytes token; };
 class Server {
  public:
   Server(const fs::path& db_path, const fs::path& blob_dir) : db_(db_path), blobs_(blob_dir) { fs::create_directories(blobs_); }
-  void setup(std::size_t capacity, double fpp, std::map<std::string,int> thresholds) {
+  void setup(std::size_t capacity, double fpp, std::map<std::string,int> thresholds, int challenge_ttl_seconds = 120) {
+    if (challenge_ttl_seconds <= 0 || challenge_ttl_seconds > 1728000) fail("challenge TTL must be in [1,1728000] seconds");
     if (thresholds.empty()) fail("at least one threshold is required"); for (const auto& [t,d] : thresholds) if (d < 0 || d >= 256) fail("each search threshold must be in [0,255]");
     if (capacity == 0) fail("Prefix Filter capacity must be positive");
     schema();
@@ -342,10 +343,10 @@ class Server {
       if (!old.step_row() || old.col_text(0) != os.str()) fail("cannot change search thresholds after records are indexed; rebuild the index first");
       if (static_cast<std::uint64_t>(existing) > capacity) fail("Prefix Filter capacity is smaller than the existing record count");
     }
-    db_.exec("BEGIN IMMEDIATE"); try { put_meta("capacity", std::to_string(capacity)); put_meta("fpp", std::to_string(fpp)); put_meta("thresholds", os.str()); db_.exec("COMMIT"); } catch (...) { try { db_.exec("ROLLBACK"); } catch (...) {} throw; }
-    load_config(); rebuild_filters();
+    db_.exec("BEGIN IMMEDIATE"); try { put_meta("capacity", std::to_string(capacity)); put_meta("fpp", std::to_string(fpp)); put_meta("thresholds", os.str()); put_meta("challenge_ttl_seconds", std::to_string(challenge_ttl_seconds)); db_.exec("COMMIT"); } catch (...) { try { db_.exec("ROLLBACK"); } catch (...) {} throw; }
+    load_config(); load_challenge_ttl(); rebuild_filters();
   }
-  void open_existing() { schema(); load_config(); rebuild_filters(); }
+  void open_existing() { schema(); load_config(); load_challenge_ttl(); rebuild_filters(); }
   int threshold(const std::string& type) const { auto it = thresholds_.find(type); if (it == thresholds_.end()) fail("no threshold configured for type: " + type); return it->second; }
   std::vector<Candidate> candidates(const std::string& type, std::span<const std::uint8_t> tag) {
     const int pieces = threshold(type) + 1; std::unordered_set<std::string> ids;
@@ -376,7 +377,7 @@ class Server {
   }
   void bind(const std::string& uid, const std::string& rid) { Stmt q(db_, "INSERT OR IGNORE INTO refs(uid,rid,created) VALUES(?1,?2,unixepoch())"); q.text(1,uid);q.text(2,rid);q.done(); }
   Challenge issue_challenge(const std::string& uid, const std::string& rid, std::span<const std::uint8_t> query_tag) {
-    Challenge c{random_bytes(32)}; Stmt q(db_, "INSERT INTO challenges(token,uid,rid,query_tag,expires,used) VALUES(?1,?2,?3,?4,unixepoch()+120,0)"); q.blob(1,c.token);q.text(2,uid);q.text(3,rid);q.blob(4,query_tag);q.done(); return c;
+    Challenge c{random_bytes(32)}; Stmt q(db_, "INSERT INTO challenges(token,uid,rid,query_tag,expires,used) VALUES(?1,?2,?3,?4,unixepoch()+?5,0)"); q.blob(1,c.token);q.text(2,uid);q.text(3,rid);q.blob(4,query_tag);q.integer(5,challenge_ttl_seconds_);q.done(); return c;
   }
   bool consume_verify(const std::string& uid, const Record& r, std::span<const std::uint8_t> query_tag, std::span<const std::uint8_t> token, std::span<const std::uint8_t> sig) {
     db_.exec("BEGIN IMMEDIATE"); bool permitted=false; try { Stmt q(db_, "SELECT uid,rid,query_tag,expires,used FROM challenges WHERE token=?1");q.blob(1,token);
@@ -393,6 +394,12 @@ class Server {
   static Bytes aad(const Record& r) { Bytes hr=record_hash(r); return hash_fields("PreFuzzDup/aad/v1", {hr,r.vk,r.nfile,r.nwrap}); }
   static Bytes challenge_message(const std::string& uid,const Record& r,std::span<const std::uint8_t> qtag,std::span<const std::uint8_t> c) { return hash_fields("PreFuzzDup/FuzzyPoW/v1", {bytes(uid),record_hash(r),Bytes(qtag.begin(),qtag.end()),Bytes(c.begin(),c.end())}); }
  private:
+  int challenge_ttl_seconds_ = 120;
+  void load_challenge_ttl() {
+    Stmt q(db_, "SELECT v FROM meta WHERE k='challenge_ttl_seconds'");
+    challenge_ttl_seconds_ = q.step_row() ? std::stoi(q.col_text(0)) : 120;
+    if (challenge_ttl_seconds_ <= 0 || challenge_ttl_seconds_ > 1728000) fail("invalid stored challenge TTL");
+  }
   Db db_; fs::path blobs_; std::size_t capacity_{}; double fpp_{}; std::map<std::string,int> thresholds_; std::unordered_map<std::string,PrefixFilter> filters_; std::unordered_map<std::string,std::size_t> record_counts_;
   static std::string filter_key(const std::string&t,int j){return t+"#"+std::to_string(j);} 
   void schema() { db_.exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA foreign_keys=ON; PRAGMA temp_store=MEMORY;"); db_.exec("CREATE TABLE IF NOT EXISTS meta(k TEXT PRIMARY KEY,v TEXT NOT NULL); CREATE TABLE IF NOT EXISTS records(rid TEXT PRIMARY KEY,type TEXT NOT NULL,tag BLOB NOT NULL,helper BLOB NOT NULL,vk BLOB NOT NULL,nfile BLOB NOT NULL,nwrap BLOB NOT NULL,cipher_path TEXT NOT NULL,ctag BLOB NOT NULL,wrap BLOB NOT NULL,wtag BLOB NOT NULL,created INTEGER NOT NULL DEFAULT(unixepoch())); CREATE TABLE IF NOT EXISTS postings(type TEXT NOT NULL,seg INTEGER NOT NULL,value BLOB NOT NULL,rid TEXT NOT NULL REFERENCES records(rid),PRIMARY KEY(type,seg,value,rid)) WITHOUT ROWID; CREATE TABLE IF NOT EXISTS refs(uid TEXT NOT NULL,rid TEXT NOT NULL REFERENCES records(rid),created INTEGER NOT NULL,PRIMARY KEY(uid,rid)); CREATE TABLE IF NOT EXISTS challenges(token BLOB PRIMARY KEY,uid TEXT NOT NULL,rid TEXT NOT NULL,query_tag BLOB NOT NULL,expires INTEGER NOT NULL,used INTEGER NOT NULL DEFAULT 0);"); }
@@ -406,14 +413,24 @@ struct ClientProof { Bytes Q, seed, vk, sig; };
 Bytes proof_seed(std::span<const std::uint8_t> Q, const Record& r) { return hkdf_expand(Q, "PreFuzzDup/proof/v1:" + hex(Server::record_hash(r)), 32); }
 Bytes wrap_key(std::span<const std::uint8_t> Q, const Record& r) { return hkdf_expand(Q, "PreFuzzDup/wrap/v1:" + hex(sha256(Server::aad(r))), 32); }
 
-Record first_upload(Server& s, const std::string& uid, const std::string& type, std::span<const std::uint8_t> file, std::span<const std::uint8_t> tag, const FuzzyExtractor& fe) {
+struct PreparedUpload { Record record; Bytes ciphertext; };
+PreparedUpload prepare_upload( const std::string& type, std::span<const std::uint8_t> file, std::span<const std::uint8_t> tag, const FuzzyExtractor& fe) {
   Record r; r.rid=hex(random_bytes(16));r.type=type;r.tag.assign(tag.begin(),tag.end());auto feo=fe.gen(recovery_representation(file,type));r.helper=feo.P;
   Bytes zero(32,0),Q=hkdf_extract(zero,feo.R); r.nfile=random_bytes(12);r.nwrap=random_bytes(12);r.vk.resize(32); // compute identity-dependent proof key after immutable record fields are present
   Bytes provisional=hash_fields("PreFuzzDup/record/v1",{bytes(r.rid),bytes(r.type),r.tag,sha256(r.helper)}); Bytes seed=hkdf_expand(Q,"PreFuzzDup/proof/v1:"+hex(provisional),32);auto kp=seed_keygen(seed);r.vk=kp.vk;
-  const Bytes ad=Server::aad(r),kd=random_bytes(32),kw=wrap_key(Q,r);auto fc=aead_encrypt(kd,r.nfile,file,ad);auto wc=aead_encrypt(kw,r.nwrap,kd,ad);r.ctag=fc.tag;r.wrap=wc.ciphertext;r.wtag=wc.tag;r.path=s.relative_blob_name(r.rid);
+  const Bytes ad=Server::aad(r),kd=random_bytes(32),kw=wrap_key(Q,r);auto fc=aead_encrypt(kd,r.nfile,file,ad);auto wc=aead_encrypt(kw,r.nwrap,kd,ad);r.ctag=fc.tag;r.wrap=wc.ciphertext;r.wtag=wc.tag;r.path=r.rid + ".bin";
   // Local AEAD check makes an accidental bad upload fail before the record becomes visible.
   auto local_k=aead_decrypt(kw,r.nwrap,r.wrap,r.wtag,ad);auto local_f=local_k?aead_decrypt(*local_k,r.nfile,fc.ciphertext,r.ctag,ad):std::nullopt;if(!local_f||!equal_ct(*local_f,file))fail("local AEAD self-check failed");
-  write_file(s.blob_path(r.rid),fc.ciphertext); try{s.insert_record(r);s.bind(uid,r.rid);}catch(...){std::error_code ec;fs::remove(s.blob_path(r.rid),ec);throw;} return r;
+  return {r, std::move(fc.ciphertext)};
+}
+
+Record first_upload(Server& s, const std::string& uid, const std::string& type, std::span<const std::uint8_t> file, std::span<const std::uint8_t> tag, const FuzzyExtractor& fe) {
+  auto prepared = prepare_upload(type, file, tag, fe);
+  const auto& r = prepared.record;
+  write_file(s.blob_path(r.rid), prepared.ciphertext);
+  try { s.insert_record(r); s.bind(uid, r.rid); }
+  catch (...) { std::error_code ec; fs::remove(s.blob_path(r.rid), ec); throw; }
+  return r;
 }
 
 std::optional<Bytes> fuzzy_pow(Server& s,const std::string& uid,const Record&r,std::span<const std::uint8_t> file,std::span<const std::uint8_t> qtag,const FuzzyExtractor& fe) {
@@ -445,6 +462,7 @@ void self_test(){
 }
 } // namespace
 
+#ifndef PREFUZZDUP_AS_LIBRARY
 int main(int argc, char** argv) {
   try {
     if (argc < 2) { usage(); return 1; }
@@ -454,7 +472,7 @@ int main(int argc, char** argv) {
     const auto o = options(argc, argv, 2);
     if (cmd == "setup") {
       Server s(need(o, "db"), need(o, "blob-dir"));
-      s.setup(std::stoull(need(o, "capacity")), std::stod(need(o, "fpp")), parse_thresholds(need(o, "threshold")));
+      s.setup(std::stoull(need(o, "capacity")), std::stod(need(o, "fpp")), parse_thresholds(need(o, "threshold")), o.count("challenge-ttl-seconds") ? std::stoi(o.at("challenge-ttl-seconds")) : 120);
       std::cout << "initialized\n";
       return 0;
     }
@@ -525,3 +543,4 @@ int main(int argc, char** argv) {
     return 2;
   }
 }
+#endif  // PREFUZZDUP_AS_LIBRARY
