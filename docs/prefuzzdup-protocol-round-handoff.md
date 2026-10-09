@@ -70,6 +70,19 @@ git push origin codex/three-scheme-protocol-full
 
 ## 客户端收到挑战后
 
+客户端首先运行审计关卡，审计通过才允许运行签名：
+
+```powershell
+python tools/protocol-handoff/client_round_audit.py `
+  --package handoff/20261008-prefuzzdup-cipher-import `
+  --request handoff/20261009-prefuzz-client-run/client-request.json `
+  --server-round handoff-results/prefuzz-full-20261009/server-round-000 `
+  --inventory results-local/three-scheme-full-protocol/candidate-inventory-v2-20261008 `
+  --output results-local/three-scheme-full-protocol/client-round-000-audit
+```
+
+审计输出的 `proof_gate=passed` 才是签名入口；`audit-report.json` 和 `challenges.csv` 要与服务端 manifest 一起留存。若任一摘要、候选、重复序号或挑战绑定错误，停止，不修正服务端 CSV。
+
 先拉取服务端结果并核对 manifest 和独立候选真值，再执行客户端签名。下列本地命令使用本轮已冻结的私有状态与二进制，不在服务器运行：
 
 ```powershell
