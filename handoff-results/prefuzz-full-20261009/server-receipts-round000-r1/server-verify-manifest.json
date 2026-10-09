@@ -1,0 +1,33 @@
+{
+  "status": "awaiting_client_recovery",
+  "run_id": "prefuzz-full-20261009",
+  "package_manifest_sha256": "84597f8ed57601c3621e84d9168cb2c189b21ecd19272a1b0ad99178c0e5af3a",
+  "proofs": 7470,
+  "receipts": 7470,
+  "proof_statuses": {
+    "signed": 6588,
+    "recovery_failed": 882
+  },
+  "receipt_statuses": {
+    "verified": 6588,
+    "client_failed": 882
+  },
+  "client_proofs_manifest_sha256": "8152edf69cf47144e3ff1d7cde59195e5e5b7be77d3577b2e04a84cf93ddc03e",
+  "server_round_manifest_sha256": "ab132c66462fceb786434127c80d59bf657c79f25689d7efd8d5e1cc0026d6b0",
+  "command": [
+    "/home/user/prefuzz-protocol-bin/server_session_cli",
+    "verify",
+    "/home/user/prefuzz-cipher-import-20261008",
+    "/home/user/prefuzz-full-20261009-round0-r1/session.sqlite",
+    "/home/user/prefuzz-full-20261009-proof-verify-work/records.tsv",
+    "/home/user/prefuzz-full-20261009-proof-verify-work/proofs.tsv",
+    "handoff-results/prefuzz-full-20261009/server-receipts-round000-r1/receipts/receipts.csv"
+  ],
+  "files": {
+    "environment.json": "d0033d735db86cdb325ebafe8e0403ba7e17aeb532cab416abac7bfedc6468f1",
+    "receipts/message-manifest.json": "b6ef29837916ff35e3a1ce85342147bdaeb52a05f1363df63ecf9589f79bcb59",
+    "receipts/receipts.csv": "30b1c1503a1b947022b22063367259e489fb24df8f63cdc668e54d6ce8ad56dd",
+    "verify.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "verify.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
