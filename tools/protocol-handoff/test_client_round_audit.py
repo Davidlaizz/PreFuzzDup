@@ -16,6 +16,14 @@ class LookupAuditTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 check_lookup(bad, truth, 'all', 4)
 
+    def test_truth_is_scoped_to_the_dataset_before_key_check(self):
+        rows = [dict(query_id='q', repeat=str(i), mode='all', strategy='prefuzz',
+                     candidate_count='1', candidates_json='[["a",0]]') for i in range(3)]
+        all_truth = {'q': [['a', 0]], 'other': [['a', 0]]}
+        self.assertEqual(check_lookup(rows, {k: all_truth[k] for k in ['q']}, 'all', 4), 3)
+        with self.assertRaises(ValueError):
+            check_lookup(rows, all_truth, 'all', 4)
+
     def test_nearest_requires_true_first_not_merely_a_close_candidate(self):
         rows = [{**self.row, 'repeat': str(i), 'mode': 'nearest', 'candidate_count': '1',
                  'candidates_json': '[["b",2]]'} for i in range(3)]

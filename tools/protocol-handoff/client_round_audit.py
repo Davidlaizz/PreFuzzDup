@@ -52,7 +52,9 @@ def main():
         match = re.fullmatch(r'(verify_100|bench_5000)_(nearest|all)_t([456])', path.stem)
         if not match: raise ValueError('unexpected lookup output')
         rows = read_csv(path)[1]
-        checked += check_lookup(rows, truth, match[2], int(match[3]))
+        _, dataset_queries = read_csv(args.package / 'inputs' / f'queries_{match[1]}.csv')
+        scoped_truth = {qid: truth[qid] for qid in (r['id'] for r in dataset_queries)}
+        checked += check_lookup(rows, scoped_truth, match[2], int(match[3]))
     if checked != 91800:
         raise ValueError('expected 91800 lookup rows')
     challenges = read_csv(args.server_round / 'challenges/challenges.csv')[1]
