@@ -1,0 +1,44 @@
+{
+  "schema": "prefuzzdup-client-request-v1",
+  "run_id": "prefuzz-full-20261009",
+  "package_manifest_sha256": "84597f8ed57601c3621e84d9168cb2c189b21ecd19272a1b0ad99178c0e5af3a",
+  "reference_count": 413921,
+  "benchmark_queries": 5000,
+  "verify_queries": 100,
+  "groups": {
+    "bench_5000": {
+      "near_ref_synthetic": 815,
+      "no_match_ref": 3800,
+      "near_ref": 185,
+      "exact_ref": 200
+    },
+    "verify_100": {
+      "near_ref_synthetic": 40,
+      "exact_ref": 30,
+      "no_match_ref": 30
+    }
+  },
+  "client_tag_validation": "passed",
+  "real_queries": 4245,
+  "synthetic_queries": 855,
+  "thresholds": [
+    4,
+    5,
+    6
+  ],
+  "modes": [
+    "nearest",
+    "all"
+  ],
+  "repeat": 3,
+  "repeat_base": 0,
+  "challenge_ttl_seconds": 1728000,
+  "jaccard_threshold": 0.5,
+  "communication_model": {
+    "rtt_ms": 1,
+    "bandwidth_bps": 1000000000
+  },
+  "git_transfer_measured": false,
+  "computation_timing": "measured",
+  "full_protocol_completed": false
+}

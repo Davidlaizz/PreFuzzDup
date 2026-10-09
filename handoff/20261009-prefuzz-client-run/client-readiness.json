@@ -1,0 +1,121 @@
+{
+  "status": "ready_for_server_first_round",
+  "run_id": "prefuzz-full-20261009",
+  "source_commit": "b6c172823bb47382df34c33cdf8088bb8d57980a",
+  "real_queries": 4245,
+  "synthetic_queries": 855,
+  "groups": {
+    "bench_5000": {
+      "near_ref_synthetic": 815,
+      "no_match_ref": 3800,
+      "near_ref": 185,
+      "exact_ref": 200
+    },
+    "verify_100": {
+      "near_ref_synthetic": 40,
+      "exact_ref": 30,
+      "no_match_ref": 30
+    }
+  },
+  "reference_ciphertexts_on_server": 2259,
+  "staged_new_upload_queries": 3830,
+  "staged_new_upload_cipher_bytes": 7208897,
+  "new_uploads_transferred": false,
+  "actual_4110_proofs_completed": false,
+  "tag_generation": {
+    "count": 12735,
+    "mean_us": 397.7404554377699,
+    "median_us": 157.4,
+    "p95_us": 1427.6,
+    "p99_us": 4432.6
+  },
+  "encryption": {
+    "fe_us": {
+      "count": 11490,
+      "mean_us": 443.9256222802437,
+      "median_us": 248.6,
+      "p95_us": 1195.6,
+      "p99_us": 3694.9
+    },
+    "derive_us": {
+      "count": 11490,
+      "mean_us": 89.5978503046127,
+      "median_us": 81.0,
+      "p95_us": 141.6,
+      "p99_us": 200.3
+    },
+    "encrypt_us": {
+      "count": 11490,
+      "mean_us": 6.024099216710183,
+      "median_us": 4.8,
+      "p95_us": 12.3,
+      "p99_us": 22.5
+    },
+    "self_check_us": {
+      "count": 11490,
+      "mean_us": 4.802053959965187,
+      "median_us": 3.8,
+      "p95_us": 8.6,
+      "p99_us": 25.5
+    },
+    "prepare_total_us": {
+      "count": 11490,
+      "mean_us": 546.1761966927763,
+      "median_us": 349.4,
+      "p95_us": 1317.6,
+      "p99_us": 3886.3
+    }
+  },
+  "orchestrator_platform": "Windows-10-10.0.19045-SP0",
+  "compute_environment": {
+    "platform": "Linux-6.18.40.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "sqlite_python_version": "3.45.1",
+    "cpu_model": "Intel(R) Core(TM) i7-10700 CPU @ 2.90GHz",
+    "memory": "MemTotal:        7983700 kB\nMemFree:         5334636 kB\nMemAvailable:    7064040 kB\nBuffers:           53876 kB\nCached:          1797648 kB\nSwapCached:            0 kB\nActive:           540728 kB\nInactive:        1753416 kB\nActive(anon):       3492 kB\nInactive(anon):   443340 kB\nActive(file):     537236 kB\nInactive(file):  1310076 kB\nUnevictable:           0 kB\nMlocked:               0 kB\nSwapTotal:       2097152 kB\nSwapFree:        2097152 kB\nDirty:                92 kB\nWriteback:             0 kB\nAnonPages:        443324 kB\nMapped:            79352 kB\nShmem:              4132 kB\nKReclaimable:      43652 kB\nSlab:             111156 kB\nSReclaimable:      43652 kB\nSUnreclaim:        67504 kB\nKernelStack:        4384 kB\nPageTables:         4496 kB\nSecPageTables:         0 kB\nNFS_Unstable:          0 kB\nBounce:                0 kB\nWritebackTmp:          0 kB\nCommitLimit:     6089000 kB\nCommitted_AS:     802040 kB\nVmallocTotal:   34359738367 kB\nVmallocUsed:       31888 kB\nVmallocChunk:          0 kB\nPercpu:             6400 kB\nHardwareCorrupted:     0 kB\nAnonHugePages:         0 kB\nShmemHugePages:        0 kB\nShmemPmdMapped:        0 kB\nFileHugePages:     14336 kB\nFilePmdMapped:         0 kB\nBalloon:               0 kB\nHugePages_Total:       0\nHugePages_Free:        0\nHugePages_Rsvd:        0\nHugePages_Surp:        0\nHugepagesize:       2048 kB\nHugetlb:               0 kB\nDirectMap4k:       35840 kB\nDirectMap2M:     4005888 kB\nDirectMap1G:    12582912 kB\n",
+    "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+    "openssl": "OpenSSL 3.0.13 30 Jan 2024 (Library: OpenSSL 3.0.13 30 Jan 2024)\n",
+    "execution": "Linux/WSL C++ worker; captured after preparation",
+    "compile_flags": "-std=c++20 -O2 -lcrypto -lsqlite3",
+    "os_page_cache_cleared": false
+  },
+  "ciphertext_retention": "retain_repeat_0_only; repeat_1_2_are_fresh_crypto_trials_discarded_after_AEAD_self_check",
+  "reference_initialization_timing": "historical prepare_total_us only; no retrospective splitting",
+  "integration_checks": {
+    "real_cipher_roundtrip": {
+      "status": "passed",
+      "scope": "local_integration_not_4110_benchmark",
+      "attempts": 18,
+      "signed": 18,
+      "verified": 18,
+      "decrypted_and_confirmed": 18,
+      "replay_rejected": 18,
+      "run_id": "local-smoke-4d4e776f102c455c94bd95390ba32d2f",
+      "query_id": "enron_full_050163",
+      "input_package_sha256": "84597f8ed57601c3621e84d9168cb2c189b21ecd19272a1b0ad99178c0e5af3a",
+      "confirmations_sha256": "51a6da3f38b2cb7740c7d34e3e0b9cf21378b751d79b4199618a8ff040c121b2"
+    },
+    "full_lookup": {
+      "status": "passed",
+      "scope": "local_full_integration_not_4110_benchmark",
+      "lookup_rows_checked_against_independent_truth": 91800,
+      "challenges": 7470,
+      "synthetic_rows": 15390,
+      "no_candidate_rows": 68940,
+      "server_manifest_sha256": "b682d2611ee176e7ee1f509045dd8a2cd668d747f9ee0e4fded6746ad8b4a7e4"
+    }
+  },
+  "communication_model": {
+    "rtt_ms": 1,
+    "bandwidth_bps": 1000000000
+  },
+  "communication_measured": false,
+  "computation_scope": "local client preparation; integration timings excluded from formal 4110 results",
+  "package_manifest_sha256": "84597f8ed57601c3621e84d9168cb2c189b21ecd19272a1b0ad99178c0e5af3a",
+  "evidence_sha256": {
+    "tag_metrics": "b5c0afd1abde034b90e79f09a517de25dea98e52525553d29a58a14056d727dd",
+    "encryption_metrics": "2d634069aec05e9cb621385fbfc1abe5b73d83fbe26dd11422c13ccf1d7d927d",
+    "roundtrip_report": "dba02b31064e7b2573279daf9983ac8bbf105e52dfef092e43fc81332c41b29f",
+    "full_check_report": "af5874a40cd612a5c0781eeb42ad3b8533f9dd317fecdf7519f59c9c9d94002c"
+  }
+}
