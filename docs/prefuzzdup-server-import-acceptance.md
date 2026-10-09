@@ -2,6 +2,8 @@
 
 日期：2026-10-09。当前仅执行 PreFuzzDup。
 
+最新检查点：客户端批处理准备、签名、解密确认和新上传加密工具已实现并执行本地验收；4,245 条真实查询产生 12,735 行标签计时，3,830 条无候选查询产生 11,490 行加密计时并各保留一份备用密文。18 次真实密文往返及重放拒绝通过，首轮脚本 91,800 行检索输出与独立真值一致。这是本地验证，4110 仍仅完成此前导入。当前执行入口见 [首轮协议交接](prefuzzdup-protocol-round-handoff.md)，公开结果见 [客户端准备摘要](../handoff/20261009-prefuzz-client-run/README.md)。以下内容保留实现过程检查点。
+
 ## 服务端返回结果
 
 已 fetch 并以 fast-forward 拉取服务端提交 `a5ccfbf`，未覆盖本地未提交改动。报告为 `handoff-results/20261008-prefuzzdup-cipher-import/server-import-report.json`。

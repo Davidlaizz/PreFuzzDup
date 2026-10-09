@@ -1,0 +1,4 @@
+# Preserve the byte hashes of offline handoff artifacts across clone platforms.
+handoff/** -text
+handoff-results/** -text
+*.bin binary

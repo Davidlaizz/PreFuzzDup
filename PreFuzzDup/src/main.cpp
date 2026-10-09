@@ -414,13 +414,25 @@ Bytes proof_seed(std::span<const std::uint8_t> Q, const Record& r) { return hkdf
 Bytes wrap_key(std::span<const std::uint8_t> Q, const Record& r) { return hkdf_expand(Q, "PreFuzzDup/wrap/v1:" + hex(sha256(Server::aad(r))), 32); }
 
 struct PreparedUpload { Record record; Bytes ciphertext; };
-PreparedUpload prepare_upload( const std::string& type, std::span<const std::uint8_t> file, std::span<const std::uint8_t> tag, const FuzzyExtractor& fe) {
+struct UploadMetrics { double fe_us = 0, derive_us = 0, encrypt_us = 0, self_check_us = 0; };
+PreparedUpload prepare_upload( const std::string& type, std::span<const std::uint8_t> file, std::span<const std::uint8_t> tag, const FuzzyExtractor& fe, UploadMetrics* metrics = nullptr) {
+  using Clock = std::chrono::steady_clock;
+  const auto begin = metrics ? Clock::now() : Clock::time_point{};
   Record r; r.rid=hex(random_bytes(16));r.type=type;r.tag.assign(tag.begin(),tag.end());auto feo=fe.gen(recovery_representation(file,type));r.helper=feo.P;
+  const auto after_fe = metrics ? Clock::now() : Clock::time_point{};
   Bytes zero(32,0),Q=hkdf_extract(zero,feo.R); r.nfile=random_bytes(12);r.nwrap=random_bytes(12);r.vk.resize(32); // compute identity-dependent proof key after immutable record fields are present
   Bytes provisional=hash_fields("PreFuzzDup/record/v1",{bytes(r.rid),bytes(r.type),r.tag,sha256(r.helper)}); Bytes seed=hkdf_expand(Q,"PreFuzzDup/proof/v1:"+hex(provisional),32);auto kp=seed_keygen(seed);r.vk=kp.vk;
-  const Bytes ad=Server::aad(r),kd=random_bytes(32),kw=wrap_key(Q,r);auto fc=aead_encrypt(kd,r.nfile,file,ad);auto wc=aead_encrypt(kw,r.nwrap,kd,ad);r.ctag=fc.tag;r.wrap=wc.ciphertext;r.wtag=wc.tag;r.path=r.rid + ".bin";
+  const Bytes ad=Server::aad(r),kd=random_bytes(32),kw=wrap_key(Q,r);
+  const auto before_encrypt = metrics ? Clock::now() : Clock::time_point{};
+  auto fc=aead_encrypt(kd,r.nfile,file,ad);auto wc=aead_encrypt(kw,r.nwrap,kd,ad);
+  const auto after_encrypt = metrics ? Clock::now() : Clock::time_point{};
+  r.ctag=fc.tag;r.wrap=wc.ciphertext;r.wtag=wc.tag;r.path=r.rid + ".bin";
   // Local AEAD check makes an accidental bad upload fail before the record becomes visible.
   auto local_k=aead_decrypt(kw,r.nwrap,r.wrap,r.wtag,ad);auto local_f=local_k?aead_decrypt(*local_k,r.nfile,fc.ciphertext,r.ctag,ad):std::nullopt;if(!local_f||!equal_ct(*local_f,file))fail("local AEAD self-check failed");
+  if (metrics) {
+    auto us = [](auto a, auto b) { return std::chrono::duration<double, std::micro>(b - a).count(); };
+    *metrics = {us(begin, after_fe), us(after_fe, before_encrypt), us(before_encrypt, after_encrypt), us(after_encrypt, Clock::now())};
+  }
   return {r, std::move(fc.ciphertext)};
 }
 
