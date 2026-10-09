@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "records": 2259,
+  "full_reference_count": 413921,
+  "cipher_bytes": 14224623,
+  "db_bytes": 1204224,
+  "db_sha256": "253a9067d5bf274125c8afa56a4879a7f8397927ffccf161bc341031d6d67ca9",
+  "records_sha256": "603452d488e7e63d96fbbf037af99ff84b012e863974ce041cee2bdeccdb349e",
+  "code_sha256": "41fcd4c8d33313f968c71eec3e7a92052f7abd32bd0966d732c32d9f21a0202d",
+  "protocol_store_only": true,
+  "search_index_created": false,
+  "crypto_verified_by_server": false,
+  "handoff_ready": false,
+  "handoff_manifest_sha256": "84597f8ed57601c3621e84d9168cb2c189b21ecd19272a1b0ad99178c0e5af3a"
+}
