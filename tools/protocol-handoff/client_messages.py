@@ -12,6 +12,7 @@ TASK = ['run', 'uid', 'query_id', 'mode', 'record_id', 'threshold', 'repeat', 'q
 CHALLENGE = TASK + ['candidate_rank']
 FAILURES = {'recovery_failed', 'verification_key_mismatch', 'decrypt_failed', 'integrity_failed',
             'similarity_rejected', 'server_rejected'}
+RECOVERY_TIMINGS = ['tag_check_us', 'key_recovery_us', 'decrypt_us', 'integrity_us', 'confirm_us']
 
 
 def key(row):
@@ -168,8 +169,10 @@ def main():
             if status != 'accepted' and status not in FAILURES:
                 raise ValueError('invalid terminal status')
             history[key(proof)][-1]['status'] = status
-            terminal.append({**{n: proof[n] for n in TASK}, 'status': status, 'jaccard': result['jaccard'] if result else ''})
-        write_csv(public / 'confirmations.csv', TASK + ['status', 'jaccard'], terminal)
+            terminal.append({**{n: proof[n] for n in TASK}, 'status': status,
+                             'jaccard': result['jaccard'] if result else '',
+                             **{name: result[name] if result else '' for name in RECOVERY_TIMINGS}})
+        write_csv(public / 'confirmations.csv', TASK + ['status', 'jaccard'] + RECOVERY_TIMINGS, terminal)
         bundle(public, 'prefuzzdup-confirmations-v1', run, digest, 'confirmations.csv',
                {'receipts_sha256': sha(args.input / 'receipts.csv')})
     temporary = history_path.with_suffix('.tmp')

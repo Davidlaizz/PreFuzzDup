@@ -81,12 +81,12 @@ python tools/protocol-handoff/client_round_audit.py `
   --output results-local/three-scheme-full-protocol/client-round-000-audit
 ```
 
-审计输出的 `proof_gate=passed` 才是签名入口；`audit-report.json` 和 `challenges.csv` 要与服务端 manifest 一起留存。若任一摘要、候选、重复序号或挑战绑定错误，停止，不修正服务端 CSV。
+审计输出的 `proof_gate=passed` 才是签名入口；`audit-report.json` 在外层，`public/challenges.csv` 是给签名器的严格消息包。两者都要与服务端 manifest 一起留存。若任一摘要、候选、重复序号或挑战绑定错误，停止，不修正服务端 CSV。
 
 先拉取服务端结果并核对 manifest 和独立候选真值，再执行客户端签名。下列本地命令使用本轮已冻结的私有状态与二进制，不在服务器运行：
 
 ```powershell
-python tools/protocol-handoff/client_messages.py sign --state results-local/three-scheme-full-protocol/client-v1-20261009 --package handoff/20261008-prefuzzdup-cipher-import --binary results-local/tool-build/client_crypto --plan results-local/three-scheme-full-protocol/prefuzz-artifacts-v3-20261008 --inventory results-local/three-scheme-full-protocol/candidate-inventory-v2-20261008 --input handoff-results/prefuzz-full-20261009/server-round-000/challenges --output results-local/three-scheme-full-protocol/client-proof-round000
+python tools/protocol-handoff/client_messages.py sign --state results-local/three-scheme-full-protocol/client-v1-20261009 --package handoff/20261008-prefuzzdup-cipher-import --binary results-local/tool-build/client_crypto --plan results-local/three-scheme-full-protocol/prefuzz-artifacts-v3-20261008 --inventory results-local/three-scheme-full-protocol/candidate-inventory-v2-20261008 --input results-local/three-scheme-full-protocol/client-round-000-audit/public --output results-local/three-scheme-full-protocol/client-proof-round000
 ```
 
 `public/` 中只有签名、公开任务字段、状态和计算耗时，才能交付；`local-work/` 和 client-state 不提交。恢复秘密 Q、seed、明文密钥均在客户端内存，不写入服务端消息。失败的真实查询显式返回 recovery_failed 等原因，不能假造成功证明。未进入的计算阶段按状态判断为未执行，不把零占位当作该阶段耗时样本。

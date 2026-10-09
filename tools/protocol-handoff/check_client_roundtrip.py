@@ -81,6 +81,9 @@ def main():
     _, results = read_csv(recoverdir / 'public/confirmations.csv')
     if len(results) != 18 or any(r['status'] != 'accepted' or float(r['jaccard']) != 1 for r in results):
         raise ValueError('client recovery/confirmation failed')
+    timings = ['tag_check_us', 'key_recovery_us', 'decrypt_us', 'integrity_us', 'confirm_us']
+    if any(not r[name] or float(r[name]) <= 0 for r in results for name in timings):
+        raise ValueError('client recovery timing missing')
     replay = args.output / 'replay.csv'
     run_worker(args.server_binary, ['verify', args.server_store, session, records_path, proof_tsv, replay])
     if any(r['status'] != 'rejected' for r in read_csv(replay)[1]):

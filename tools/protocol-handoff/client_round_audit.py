@@ -66,10 +66,12 @@ def main():
     if len(challenge_keys) != len(challenges):
         raise ValueError('duplicate challenge key')
     args.output.mkdir(parents=True)
-    selected = args.output / 'challenges.csv'
+    public = args.output / 'public'
+    public.mkdir()
+    selected = public / 'challenges.csv'
     fields, rows = read_csv(args.server_round / 'challenges/challenges.csv')
     write_csv(selected, fields, rows)
-    bundle(args.output, 'prefuzzdup-challenges-v1', request['run_id'], package_digest, 'challenges.csv',
+    bundle(public, 'prefuzzdup-challenges-v1', request['run_id'], package_digest, 'challenges.csv',
            {'server_round_manifest_sha256': sha(args.server_round / 'server-round-manifest.json'),
             'lookup_rows_checked': checked, 'challenge_count': len(challenges)})
     report = dict(status='passed', run_id=request['run_id'], lookup_rows_checked=checked,
