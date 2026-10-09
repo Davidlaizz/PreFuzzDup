@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "run_id": "prefuzz-full-20261009",
+  "lookup_rows_checked": 91800,
+  "challenges": 7470,
+  "server_round_manifest_sha256": "ab132c66462fceb786434127c80d59bf657c79f25689d7efd8d5e1cc0026d6b0",
+  "candidate_truth_sha256": "e8329b2e9e27f7b11e2c610bcf70a1bf4984e67a3b01197581e6211724bcac11",
+  "proof_gate": "passed",
+  "signed": false
+}
