@@ -1,0 +1,2 @@
+records=413921, tag_bits=256, index_prepare_us=993867, disk_index_reused=1, filter_bytes_estimate=12689480, sqlite_cache_kib=0, sqlite_mmap=0
+prefuzz: queries=15000, mean_us=64.17, p95_us=163.00, mean_candidates=1.61, mean_distance_computations=3.07, mean_filter_queries=7.00, mean_inverted_lookups=1.41, mean_posting_records_read=9.90

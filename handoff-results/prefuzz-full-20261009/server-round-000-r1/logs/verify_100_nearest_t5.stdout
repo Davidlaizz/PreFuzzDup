@@ -1,0 +1,3 @@
+equivalence_check=passed (not included in latency measurement)
+records=413921, tag_bits=256, index_prepare_us=25333928, disk_index_reused=0, filter_bytes_estimate=10877088, sqlite_cache_kib=0, sqlite_mmap=0
+prefuzz: queries=300, mean_us=70.82, p95_us=135.00, mean_candidates=0.70, mean_distance_computations=1.70, mean_filter_queries=6.00, mean_inverted_lookups=3.44, mean_posting_records_read=7.50

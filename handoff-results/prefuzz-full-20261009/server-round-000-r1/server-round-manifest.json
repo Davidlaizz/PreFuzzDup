@@ -1,0 +1,542 @@
+{
+  "status": "awaiting_client_proofs",
+  "run_id": "prefuzz-full-20261009",
+  "package_manifest_sha256": "84597f8ed57601c3621e84d9168cb2c189b21ecd19272a1b0ad99178c0e5af3a",
+  "client_request_sha256": "cb49ac910bb54ec42c3adb4689256ec50886208febc31875ae1c8261ec72cd26",
+  "commands": [
+    {
+      "name": "verify_100_nearest_t4",
+      "command": [
+        "/home/user/fl/PreFuzzDup/PreFuzzDup/build/prefuzzdup_persistent_lookup",
+        "--records",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/reference.csv",
+        "--queries",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/queries_verify_100.csv",
+        "--db",
+        "/home/user/prefuzz-full-20261009-round0-r1/index_t4.sqlite",
+        "--tag-bits",
+        "256",
+        "--threshold",
+        "default=4",
+        "--fpp",
+        "0.01",
+        "--strategies",
+        "prefuzz",
+        "--mode",
+        "nearest",
+        "--repeat",
+        "3",
+        "--sqlite-cache-kib",
+        "0",
+        "--out",
+        "/home/user/prefuzz-full-20261009-round0-r1/verify_100_nearest_t4.csv",
+        "--verify-equivalence"
+      ],
+      "wall_seconds": 433.11186474900023
+    },
+    {
+      "name": "verify_100_all_t4",
+      "command": [
+        "/home/user/fl/PreFuzzDup/PreFuzzDup/build/prefuzzdup_persistent_lookup",
+        "--records",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/reference.csv",
+        "--queries",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/queries_verify_100.csv",
+        "--db",
+        "/home/user/prefuzz-full-20261009-round0-r1/index_t4.sqlite",
+        "--tag-bits",
+        "256",
+        "--threshold",
+        "default=4",
+        "--fpp",
+        "0.01",
+        "--strategies",
+        "prefuzz",
+        "--mode",
+        "all",
+        "--repeat",
+        "3",
+        "--sqlite-cache-kib",
+        "0",
+        "--out",
+        "/home/user/prefuzz-full-20261009-round0-r1/verify_100_all_t4.csv",
+        "--verify-equivalence"
+      ],
+      "wall_seconds": 450.5309609920005
+    },
+    {
+      "name": "verify_100_nearest_t5",
+      "command": [
+        "/home/user/fl/PreFuzzDup/PreFuzzDup/build/prefuzzdup_persistent_lookup",
+        "--records",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/reference.csv",
+        "--queries",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/queries_verify_100.csv",
+        "--db",
+        "/home/user/prefuzz-full-20261009-round0-r1/index_t5.sqlite",
+        "--tag-bits",
+        "256",
+        "--threshold",
+        "default=5",
+        "--fpp",
+        "0.01",
+        "--strategies",
+        "prefuzz",
+        "--mode",
+        "nearest",
+        "--repeat",
+        "3",
+        "--sqlite-cache-kib",
+        "0",
+        "--out",
+        "/home/user/prefuzz-full-20261009-round0-r1/verify_100_nearest_t5.csv",
+        "--verify-equivalence"
+      ],
+      "wall_seconds": 472.72664461899694
+    },
+    {
+      "name": "verify_100_all_t5",
+      "command": [
+        "/home/user/fl/PreFuzzDup/PreFuzzDup/build/prefuzzdup_persistent_lookup",
+        "--records",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/reference.csv",
+        "--queries",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/queries_verify_100.csv",
+        "--db",
+        "/home/user/prefuzz-full-20261009-round0-r1/index_t5.sqlite",
+        "--tag-bits",
+        "256",
+        "--threshold",
+        "default=5",
+        "--fpp",
+        "0.01",
+        "--strategies",
+        "prefuzz",
+        "--mode",
+        "all",
+        "--repeat",
+        "3",
+        "--sqlite-cache-kib",
+        "0",
+        "--out",
+        "/home/user/prefuzz-full-20261009-round0-r1/verify_100_all_t5.csv",
+        "--verify-equivalence"
+      ],
+      "wall_seconds": 467.97249212099996
+    },
+    {
+      "name": "verify_100_nearest_t6",
+      "command": [
+        "/home/user/fl/PreFuzzDup/PreFuzzDup/build/prefuzzdup_persistent_lookup",
+        "--records",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/reference.csv",
+        "--queries",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/queries_verify_100.csv",
+        "--db",
+        "/home/user/prefuzz-full-20261009-round0-r1/index_t6.sqlite",
+        "--tag-bits",
+        "256",
+        "--threshold",
+        "default=6",
+        "--fpp",
+        "0.01",
+        "--strategies",
+        "prefuzz",
+        "--mode",
+        "nearest",
+        "--repeat",
+        "3",
+        "--sqlite-cache-kib",
+        "0",
+        "--out",
+        "/home/user/prefuzz-full-20261009-round0-r1/verify_100_nearest_t6.csv",
+        "--verify-equivalence"
+      ],
+      "wall_seconds": 476.61601127600443
+    },
+    {
+      "name": "verify_100_all_t6",
+      "command": [
+        "/home/user/fl/PreFuzzDup/PreFuzzDup/build/prefuzzdup_persistent_lookup",
+        "--records",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/reference.csv",
+        "--queries",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/queries_verify_100.csv",
+        "--db",
+        "/home/user/prefuzz-full-20261009-round0-r1/index_t6.sqlite",
+        "--tag-bits",
+        "256",
+        "--threshold",
+        "default=6",
+        "--fpp",
+        "0.01",
+        "--strategies",
+        "prefuzz",
+        "--mode",
+        "all",
+        "--repeat",
+        "3",
+        "--sqlite-cache-kib",
+        "0",
+        "--out",
+        "/home/user/prefuzz-full-20261009-round0-r1/verify_100_all_t6.csv",
+        "--verify-equivalence"
+      ],
+      "wall_seconds": 495.6363303899998
+    },
+    {
+      "name": "bench_5000_nearest_t4",
+      "command": [
+        "/home/user/fl/PreFuzzDup/PreFuzzDup/build/prefuzzdup_persistent_lookup",
+        "--records",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/reference.csv",
+        "--queries",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/queries_bench_5000.csv",
+        "--db",
+        "/home/user/prefuzz-full-20261009-round0-r1/index_t4.sqlite",
+        "--tag-bits",
+        "256",
+        "--threshold",
+        "default=4",
+        "--fpp",
+        "0.01",
+        "--strategies",
+        "prefuzz",
+        "--mode",
+        "nearest",
+        "--repeat",
+        "3",
+        "--sqlite-cache-kib",
+        "0",
+        "--out",
+        "/home/user/prefuzz-full-20261009-round0-r1/bench_5000_nearest_t4.csv"
+      ],
+      "wall_seconds": 2.4987611879987526
+    },
+    {
+      "name": "bench_5000_all_t4",
+      "command": [
+        "/home/user/fl/PreFuzzDup/PreFuzzDup/build/prefuzzdup_persistent_lookup",
+        "--records",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/reference.csv",
+        "--queries",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/queries_bench_5000.csv",
+        "--db",
+        "/home/user/prefuzz-full-20261009-round0-r1/index_t4.sqlite",
+        "--tag-bits",
+        "256",
+        "--threshold",
+        "default=4",
+        "--fpp",
+        "0.01",
+        "--strategies",
+        "prefuzz",
+        "--mode",
+        "all",
+        "--repeat",
+        "3",
+        "--sqlite-cache-kib",
+        "0",
+        "--out",
+        "/home/user/prefuzz-full-20261009-round0-r1/bench_5000_all_t4.csv"
+      ],
+      "wall_seconds": 2.617736355001398
+    },
+    {
+      "name": "bench_5000_nearest_t5",
+      "command": [
+        "/home/user/fl/PreFuzzDup/PreFuzzDup/build/prefuzzdup_persistent_lookup",
+        "--records",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/reference.csv",
+        "--queries",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/queries_bench_5000.csv",
+        "--db",
+        "/home/user/prefuzz-full-20261009-round0-r1/index_t5.sqlite",
+        "--tag-bits",
+        "256",
+        "--threshold",
+        "default=5",
+        "--fpp",
+        "0.01",
+        "--strategies",
+        "prefuzz",
+        "--mode",
+        "nearest",
+        "--repeat",
+        "3",
+        "--sqlite-cache-kib",
+        "0",
+        "--out",
+        "/home/user/prefuzz-full-20261009-round0-r1/bench_5000_nearest_t5.csv"
+      ],
+      "wall_seconds": 2.917366914996819
+    },
+    {
+      "name": "bench_5000_all_t5",
+      "command": [
+        "/home/user/fl/PreFuzzDup/PreFuzzDup/build/prefuzzdup_persistent_lookup",
+        "--records",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/reference.csv",
+        "--queries",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/queries_bench_5000.csv",
+        "--db",
+        "/home/user/prefuzz-full-20261009-round0-r1/index_t5.sqlite",
+        "--tag-bits",
+        "256",
+        "--threshold",
+        "default=5",
+        "--fpp",
+        "0.01",
+        "--strategies",
+        "prefuzz",
+        "--mode",
+        "all",
+        "--repeat",
+        "3",
+        "--sqlite-cache-kib",
+        "0",
+        "--out",
+        "/home/user/prefuzz-full-20261009-round0-r1/bench_5000_all_t5.csv"
+      ],
+      "wall_seconds": 2.7665693779999856
+    },
+    {
+      "name": "bench_5000_nearest_t6",
+      "command": [
+        "/home/user/fl/PreFuzzDup/PreFuzzDup/build/prefuzzdup_persistent_lookup",
+        "--records",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/reference.csv",
+        "--queries",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/queries_bench_5000.csv",
+        "--db",
+        "/home/user/prefuzz-full-20261009-round0-r1/index_t6.sqlite",
+        "--tag-bits",
+        "256",
+        "--threshold",
+        "default=6",
+        "--fpp",
+        "0.01",
+        "--strategies",
+        "prefuzz",
+        "--mode",
+        "nearest",
+        "--repeat",
+        "3",
+        "--sqlite-cache-kib",
+        "0",
+        "--out",
+        "/home/user/prefuzz-full-20261009-round0-r1/bench_5000_nearest_t6.csv"
+      ],
+      "wall_seconds": 3.098325389997626
+    },
+    {
+      "name": "bench_5000_all_t6",
+      "command": [
+        "/home/user/fl/PreFuzzDup/PreFuzzDup/build/prefuzzdup_persistent_lookup",
+        "--records",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/reference.csv",
+        "--queries",
+        "/home/user/prefuzz-full-20261009-round0-r1/inputs/queries_bench_5000.csv",
+        "--db",
+        "/home/user/prefuzz-full-20261009-round0-r1/index_t6.sqlite",
+        "--tag-bits",
+        "256",
+        "--threshold",
+        "default=6",
+        "--fpp",
+        "0.01",
+        "--strategies",
+        "prefuzz",
+        "--mode",
+        "all",
+        "--repeat",
+        "3",
+        "--sqlite-cache-kib",
+        "0",
+        "--out",
+        "/home/user/prefuzz-full-20261009-round0-r1/bench_5000_all_t6.csv"
+      ],
+      "wall_seconds": 3.0275037289975444
+    }
+  ],
+  "benchmark_rows": 90000,
+  "verify_rows": 1800,
+  "challenges": 7470,
+  "synthetic_rows": 15390,
+  "no_candidate_rows": 68940,
+  "sqlite_sizes": {
+    "index_t5.sqlite": 90148864,
+    "index_t6.sqlite": 98947072,
+    "index_t4.sqlite": 80617472
+  },
+  "files": {
+    "challenge-metrics.csv": {
+      "sha256": "6e96e35775d6ba96298516b002e26cac2cef992862d4a04bce962bbf654f148b",
+      "bytes": 1762496
+    },
+    "challenges/challenges.csv": {
+      "sha256": "bf59f67e450fbad57a84bb47d6123f836030d5b6666b241d0807cbab673098eb",
+      "bytes": 1591190
+    },
+    "challenges/message-manifest.json": {
+      "sha256": "332bf49d5836c6afdb85958e71821b53e30c9b0a8c9a0a5d309ecbc59a242b4e",
+      "bytes": 331
+    },
+    "environment.json": {
+      "sha256": "f26845210770d30f7c3fb3b10f2901cf3d9d234154912c0d4a0721d6af6f749b",
+      "bytes": 59802
+    },
+    "logs/bench_5000_all_t4.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/bench_5000_all_t4.stdout": {
+      "sha256": "f072f6455362b00b9be5b0ec2b6763ad702d19987fed6bb092e30ebf6f50883b",
+      "bytes": 335
+    },
+    "logs/bench_5000_all_t5.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/bench_5000_all_t5.stdout": {
+      "sha256": "55994fd5cb4b50edf062780b94aa9a8a1b2a24c02a78a6c3de3b0e5a23937392",
+      "bytes": 336
+    },
+    "logs/bench_5000_all_t6.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/bench_5000_all_t6.stdout": {
+      "sha256": "510a352a1a36efd4e169521f64ac27f6c0bfee55d1373ae504cc4472cf7a5ee1",
+      "bytes": 336
+    },
+    "logs/bench_5000_nearest_t4.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/bench_5000_nearest_t4.stdout": {
+      "sha256": "e13f5a1644cddd0487a00240c7b7e10cfabf0d87882ffa9ca849de27ea898c93",
+      "bytes": 335
+    },
+    "logs/bench_5000_nearest_t5.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/bench_5000_nearest_t5.stdout": {
+      "sha256": "f57233034b3b58248892cfb8ee784927d71e5826c4ad6b5af38d74e028e5ef85",
+      "bytes": 336
+    },
+    "logs/bench_5000_nearest_t6.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/bench_5000_nearest_t6.stdout": {
+      "sha256": "8b37db738f43c6030d961fd252d6cc3ca13e0f1b3b6e4352a6966bb2b4ffecce",
+      "bytes": 337
+    },
+    "logs/issue.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/issue.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/verify_100_all_t4.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/verify_100_all_t4.stdout": {
+      "sha256": "838821de5a4eb9711cd90356d205f038d5bbb591a35d2fb2ee73e491caba0d97",
+      "bytes": 396
+    },
+    "logs/verify_100_all_t5.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/verify_100_all_t5.stdout": {
+      "sha256": "af4b821419d6f5084cbda4a39cd821c878cdd6102ef7fc9682848e5f3e25bdaa",
+      "bytes": 397
+    },
+    "logs/verify_100_all_t6.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/verify_100_all_t6.stdout": {
+      "sha256": "f4db48e409791500397a360b51c8bf3d3eacd44e261e27881a2139cc357a0545",
+      "bytes": 398
+    },
+    "logs/verify_100_nearest_t4.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/verify_100_nearest_t4.stdout": {
+      "sha256": "02dfcdc0cfd8d1b375f601dc4db0f84c365fa59fe60dff8b32bec8fc55ee3fad",
+      "bytes": 397
+    },
+    "logs/verify_100_nearest_t5.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/verify_100_nearest_t5.stdout": {
+      "sha256": "22e52271a65fff35c7b0b5408ce556de4d26d5bc7b3be5d2733c8aa335833477",
+      "bytes": 399
+    },
+    "logs/verify_100_nearest_t6.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "logs/verify_100_nearest_t6.stdout": {
+      "sha256": "f181d0c8b9db4742f81514c34d788e54816d34634eaa75b396e02d6670bdf8d6",
+      "bytes": 399
+    },
+    "lookup/bench_5000_all_t4.csv": {
+      "sha256": "46855a8c02c6a949ef14a7c36c1ba0198460c413f514008caebe61c20d89ead3",
+      "bytes": 1423182
+    },
+    "lookup/bench_5000_all_t5.csv": {
+      "sha256": "1e6c445d98d29e9add3b2e2fe8646ebe1b30333cdf9ad680280a06f5a14456ee",
+      "bytes": 1435579
+    },
+    "lookup/bench_5000_all_t6.csv": {
+      "sha256": "468b2aa950773adfaeee00e7bdc688ccab0335194e202b25d4649aed5efa8607",
+      "bytes": 1457169
+    },
+    "lookup/bench_5000_nearest_t4.csv": {
+      "sha256": "ec8e497dc93db4375c616bd9dd2c1abd0b8ad8fb81ba86c953ad8e69e83185f7",
+      "bytes": 977270
+    },
+    "lookup/bench_5000_nearest_t5.csv": {
+      "sha256": "7e8442709f4da910744504f5087aabe9a3999bf14ece5882aaefbce49c096dec",
+      "bytes": 979046
+    },
+    "lookup/bench_5000_nearest_t6.csv": {
+      "sha256": "94052772e9a34cd5cb6e3b2ca5330ebbfb7b083769c8a128c70e4435d11d558b",
+      "bytes": 980852
+    },
+    "lookup/verify_100_all_t4.csv": {
+      "sha256": "3c71a19e0a55805b3bf40f4dc7cc12e6f23e497ed894f249b31e661cfab8fd4d",
+      "bytes": 28958
+    },
+    "lookup/verify_100_all_t5.csv": {
+      "sha256": "6eb347146ed8076273494eb541142969b519c0db483476b9076add5aba8b0d5b",
+      "bytes": 29061
+    },
+    "lookup/verify_100_all_t6.csv": {
+      "sha256": "338329f85b8c71941dad6fb07d69f59d08dc2137c169fd70b963b50d72286903",
+      "bytes": 29128
+    },
+    "lookup/verify_100_nearest_t4.csv": {
+      "sha256": "e8cb0313d289d292e57c930a7a7268c6db27acf4fb06dfdc86194ae2c34f22ee",
+      "bytes": 23715
+    },
+    "lookup/verify_100_nearest_t5.csv": {
+      "sha256": "69caeb82c5bfe907225e8b8c96a0c4807617e991037f1ace15c03fc393fe5c97",
+      "bytes": 23835
+    },
+    "lookup/verify_100_nearest_t6.csv": {
+      "sha256": "8a22b6aab1fbb23698ed9e4a8d1395e4234b664f6275df9929e506e73c7bf429",
+      "bytes": 23928
+    }
+  }
+}
