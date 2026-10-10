@@ -1,0 +1,29 @@
+{
+  "confirmations_rank0_sha256": "b51113048faf8f7d2a746b3fa03a9a0c7d4ad86ea2cb7f41044a5126169b5469",
+  "confirmations_rank1_sha256": "4d3381b2098a49d5d70c0a14823b95b8928bc66b2877872528d9886c751458d0",
+  "confirmations_rank2_sha256": "545acb683e3693c667e46c273550866d937af355258a46402b83d7587e9cddfc",
+  "confirmations_rank3_sha256": "95eb5a74a9741e8149a1bb4e5449be5e893e2e0666bc1c7624438bac6f6f67c3",
+  "prior_rounds_checked": 4,
+  "run_id": "prefuzz-full-20261009",
+  "package_manifest_sha256": "84597f8ed57601c3621e84d9168cb2c189b21ecd19272a1b0ad99178c0e5af3a",
+  "status": "awaiting_client_proofs",
+  "candidate_round": 4,
+  "next_challenges": 150,
+  "command": [
+    "/home/user/prefuzz-protocol-bin/server_session_cli",
+    "issue",
+    "/home/user/prefuzz-cipher-import-20261008",
+    "/home/user/prefuzz-full-20261009-round0-r1/session.sqlite",
+    "/home/user/prefuzz-full-20261009-round4-issue-work/records.tsv",
+    "/home/user/prefuzz-full-20261009-round4-issue-work/tasks.tsv",
+    "/home/user/fl/PreFuzzDup/handoff-results/prefuzz-full-20261009/server-next-round-004/challenge-metrics.csv"
+  ],
+  "files": {
+    "environment.json": "54db614fca41e09b1d0c0aedfbf4b8c98d085d03534e067d8ba0f949a8c2311c",
+    "issue.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "issue.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "challenge-metrics.csv": "0b5c9524459cedc01cce22dcc5bc97ba59dfb8ac327897c19a9d472ba65adeeb",
+    "challenges/message-manifest.json": "c14a7722be167fbe6c6ffd558cc09724bab48201b63a5e13e02f9968b2fdad18",
+    "challenges/challenges.csv": "f2b75b69e79e91eeedcde0f350d2fe18874656aed3bb12e1c2c375b9640cdd4a"
+  }
+}
