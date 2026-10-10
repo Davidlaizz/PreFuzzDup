@@ -16,7 +16,7 @@ def main():
     for name in ['package', 'request', 'server-round', 'client-proofs', 'store', 'session-db',
                  'session-binary', 'work', 'output']:
         p.add_argument('--' + name, type=Path, required=True)
-    p.add_argument('--candidate-round', type=int, choices=[0, 1, 2, 3], required=True)
+    p.add_argument('--candidate-round', type=int, choices=[0, 1, 2, 3, 4], required=True)
     p.add_argument('--confirmations', type=Path)
     args = p.parse_args()
     if args.output.exists() or args.work.exists():
@@ -56,8 +56,9 @@ def main():
     expected_proofs = (Counter({'signed': 6588, 'recovery_failed': 882}) if args.candidate_round == 0
                        else Counter({'signed': 111, 'recovery_failed': 183}) if args.candidate_round == 1
                        else Counter({'signed': 87, 'recovery_failed': 99}) if args.candidate_round == 2
-                       else Counter({'signed': 105, 'recovery_failed': 66}))
-    if ([7470, 294, 186, 171][args.candidate_round] != len(proofs) or
+                       else Counter({'signed': 105, 'recovery_failed': 66}) if args.candidate_round == 3
+                       else Counter({'signed': 99, 'recovery_failed': 51}))
+    if ([7470, 294, 186, 171, 150][args.candidate_round] != len(proofs) or
             len(challenge_keys) != len(challenges) or len(challenges) != len(proofs) or
             len({tuple(r[n] for n in TASK) for r in proofs}) != len(proofs)):
         raise ValueError('proof/challenge coverage mismatch')
@@ -90,7 +91,8 @@ def main():
     expected = (Counter({'verified': 6588, 'client_failed': 882}) if args.candidate_round == 0
                 else Counter({'verified': 111, 'client_failed': 183}) if args.candidate_round == 1
                 else Counter({'verified': 87, 'client_failed': 99}) if args.candidate_round == 2
-                else Counter({'verified': 105, 'client_failed': 66}))
+                else Counter({'verified': 105, 'client_failed': 66}) if args.candidate_round == 3
+                else Counter({'verified': 99, 'client_failed': 51}))
     if receipt_statuses != expected:
         raise ValueError(f'unexpected receipt statuses: {dict(receipt_statuses)}')
     bundle(receipts_root, 'prefuzzdup-receipts-v1', run, digest, 'receipts.csv',

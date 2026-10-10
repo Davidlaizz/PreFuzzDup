@@ -24,6 +24,8 @@ class MetadataTests(unittest.TestCase):
              None, 'next-round-manifest.json'),
             (3, 'server-next-round-003', 'client-proof-round003',
              None, 'next-round-manifest.json'),
+            (4, 'server-next-round-004', 'client-proof-round004',
+             None, 'next-round-manifest.json'),
         ]:
             with self.subTest(round=round_id), tempfile.TemporaryDirectory() as tmp:
                 root = Path(tmp)
@@ -40,7 +42,8 @@ class MetadataTests(unittest.TestCase):
                     store=store, session_db=session, session_binary=binary,
                     work=root / 'work', output=output, candidate_round=round_id,
                     confirmations=RUN / ({2: 'client-confirmation-round001/public',
-                                          3: 'client-confirmation-round002/public'}[round_id]
+                                          3: 'client-confirmation-round002/public',
+                                          4: 'client-confirmation-round003/public'}[round_id]
                                          if round_id > 1 else 'client-confirmation-round000-r1/public'))
                 argv = ['server_verify_proofs.py']
                 for name, value in arguments.items():
@@ -79,7 +82,7 @@ class MetadataTests(unittest.TestCase):
                 else:
                     result = json.loads((output / 'server-verify-manifest.json').read_text())
                     self.assertEqual((result['candidate_round'], result['receipts']),
-                                     (round_id, {2: 186, 3: 171}[round_id]))
+                                     (round_id, {2: 186, 3: 171, 4: 150}[round_id]))
 
 
 if __name__ == '__main__':

@@ -1,0 +1,12 @@
+{
+  "schema": "prefuzzdup-proofs-v1",
+  "run_id": "prefuzz-full-20261009",
+  "package_manifest_sha256": "84597f8ed57601c3621e84d9168cb2c189b21ecd19272a1b0ad99178c0e5af3a",
+  "files": {
+    "proofs.csv": {
+      "sha256": "3d7902ccef5e0c82ca6d1a0ff03ef2be4698b4d0daec3ced9e2d9af5484b9f56",
+      "bytes": 52816
+    }
+  },
+  "challenges_sha256": "f2b75b69e79e91eeedcde0f350d2fe18874656aed3bb12e1c2c375b9640cdd4a"
+}
