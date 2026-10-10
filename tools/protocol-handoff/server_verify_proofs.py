@@ -19,7 +19,7 @@ def main():
     args = p.parse_args()
     if args.output.exists() or args.work.exists():
         raise FileExistsError('output and work must be new directories')
-    if not args.store.is_file() or not args.session_db.is_file() or not args.session_binary.is_file():
+    if not args.store.is_dir() or not args.session_db.is_file() or not args.session_binary.is_file():
         raise FileNotFoundError('store, session database, or session binary is missing')
 
     from cipher_handoff import verify
