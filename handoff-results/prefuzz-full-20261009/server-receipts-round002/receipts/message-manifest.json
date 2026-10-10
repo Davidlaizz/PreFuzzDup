@@ -1,0 +1,13 @@
+{
+  "schema": "prefuzzdup-receipts-v1",
+  "run_id": "prefuzz-full-20261009",
+  "package_manifest_sha256": "84597f8ed57601c3621e84d9168cb2c189b21ecd19272a1b0ad99178c0e5af3a",
+  "files": {
+    "receipts.csv": {
+      "sha256": "822a480fbab838c4e9f245379d644a0705c98ad4f28ebb775787a887bfd036f9",
+      "bytes": 44420
+    }
+  },
+  "proofs_sha256": "11a62f81e1dd31e3d65e71c5aef703b84af7f7f01ff7fce1f87bb633a08e8df7",
+  "server_round_manifest_sha256": "05e3a394f42f2276b1fa2de39871fa80f217f8ead2e964a82c7ec12d6a1b4034"
+}
