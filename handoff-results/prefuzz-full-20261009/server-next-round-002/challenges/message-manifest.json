@@ -1,0 +1,13 @@
+{
+  "schema": "prefuzzdup-challenges-v1",
+  "run_id": "prefuzz-full-20261009",
+  "package_manifest_sha256": "84597f8ed57601c3621e84d9168cb2c189b21ecd19272a1b0ad99178c0e5af3a",
+  "files": {
+    "challenges.csv": {
+      "sha256": "9d7edf0c8c68387926e5057a62b94dab253ffbdf7c85efbbf0fbedffaf057119",
+      "bytes": 39326
+    }
+  },
+  "confirmations_sha256": "4d3381b2098a49d5d70c0a14823b95b8928bc66b2877872528d9886c751458d0",
+  "candidate_round": 2
+}

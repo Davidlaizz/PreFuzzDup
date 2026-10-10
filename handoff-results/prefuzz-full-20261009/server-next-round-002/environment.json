@@ -1,0 +1,7 @@
+{
+  "platform": "Linux-6.8.0-59-generic-x86_64-with-glibc2.35",
+  "code_commit": "c717f21900958be841bcf0d4bd6c3aa777b706ba",
+  "script_sha256": "e3d5eb8fe76491a879ed859cfb243a74794d9fec0b19edd8f93a460bcf2e2228",
+  "session_binary_sha256": "ab68133772d3a4bb94a4f4a64320fac725f8e8eab297e4d9e04ec249ddea1cea",
+  "git_transfer_measured": false
+}
