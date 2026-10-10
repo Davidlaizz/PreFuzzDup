@@ -86,7 +86,7 @@ def main():
         raise ValueError(f'unexpected receipt statuses: {dict(receipt_statuses)}')
     bundle(receipts_root, 'prefuzzdup-receipts-v1', run, digest, 'receipts.csv',
            {'proofs_sha256': sha(args.client_proofs / 'proofs.csv'),
-            'server_round_manifest_sha256': sha(args.server_round / 'server-round-manifest.json')})
+            'server_round_manifest_sha256': sha(args.server_round / manifest_name)})
 
     environment = dict(platform=platform.platform(), cpu_info=Path('/proc/cpuinfo').read_text(),
                        code_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
@@ -100,7 +100,7 @@ def main():
                     package_manifest_sha256=digest, proofs=len(proofs), receipts=len(receipts),
                     proof_statuses=dict(proof_statuses), receipt_statuses=dict(receipt_statuses),
                     client_proofs_manifest_sha256=sha(args.client_proofs / 'message-manifest.json'),
-                    server_round_manifest_sha256=sha(args.server_round / 'server-round-manifest.json'),
+                    server_round_manifest_sha256=sha(args.server_round / manifest_name),
                     command=command, files={p.relative_to(args.output).as_posix(): sha(p)
                                             for p in sorted(args.output.rglob('*')) if p.is_file()})
     (args.output / 'server-verify-manifest.json').write_text(json.dumps(manifest, indent=2))
