@@ -7,17 +7,17 @@ import subprocess
 from collections import Counter
 from pathlib import Path
 
-from client_messages import CHALLENGE, FAILURES, TASK, bundle, read_bundle, write_csv
+from client_messages import CHALLENGE, FAILURES, TASK, bundle, key, read_bundle, write_csv
 from import_prefuzz_artifacts import read_csv, sha
 
 
-def attempt_key(row):
-    return tuple(row[name] for name in TASK)
+def lookup_key(row, mode, threshold):
+    return (row['run'], row['uid'], row['query_id'], mode, threshold, row['repeat'])
 
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    for name in ['package', 'request', 'server-round', 'client-proofs', 'receipts',
+    for name in ['package', 'request', 'server-round', 'verify-round', 'client-proofs', 'receipts',
                  'confirmations', 'store', 'session-db', 'session-binary', 'work', 'output']:
         p.add_argument('--' + name, type=Path, required=True)
     args = p.parse_args()
@@ -35,10 +35,14 @@ def main():
     _, receipts = read_bundle(args.receipts, 'prefuzzdup-receipts-v1', run, digest, 'receipts.csv')
     confirm_manifest, confirmations = read_bundle(args.confirmations, 'prefuzzdup-confirmations-v1',
                                                   run, digest, 'confirmations.csv')
-    round_manifest = json.loads((args.server_round / 'server-round-manifest.json').read_text())
-    if (round_manifest.get('status') != 'awaiting_client_recovery' or
-            round_manifest.get('run_id') != run or
-            round_manifest.get('client_request_sha256') != sha(args.request) or
+    verify_manifest = json.loads((args.verify_round / 'server-verify-manifest.json').read_text())
+    if (verify_manifest.get('status') != 'awaiting_client_recovery' or
+            verify_manifest.get('run_id') != run or
+            verify_manifest.get('package_manifest_sha256') != digest or
+            verify_manifest.get('server_round_manifest_sha256') !=
+            sha(args.server_round / 'server-round-manifest.json') or
+            verify_manifest.get('client_proofs_manifest_sha256') !=
+            sha(args.client_proofs / 'message-manifest.json') or
             confirm_manifest.get('receipts_sha256') != sha(args.receipts / 'receipts.csv')):
         raise ValueError('confirmation/receipt/round binding mismatch')
 
@@ -55,17 +59,17 @@ def main():
     for row in confirmations:
         proof = proof_by_token[row['token']]
         receipt = receipt_by_token[row['token']]
+        expected_receipt = 'verified' if row['status'] in {'accepted', 'similarity_rejected'} else 'client_failed'
         if (any(row[n] != proof[n] for n in TASK) or any(row[n] != receipt[n] for n in TASK) or
-                (row['status'] == 'accepted') != (receipt['status'] == 'verified') or
-                (row['status'] in FAILURES and receipt['status'] != 'client_failed')):
+                receipt['status'] != expected_receipt):
             raise ValueError('confirmation binding/status mismatch')
 
     _, challenges = read_csv(args.server_round / 'challenges/challenges.csv')
     rank_by_token = {r['token']: int(r['candidate_rank']) for r in challenges}
     history = {}
     for row in confirmations:
-        key = attempt_key(row)
-        history.setdefault(key, []).append((rank_by_token[row['token']], row['status']))
+        logical_key = key(row)
+        history.setdefault(logical_key, []).append((rank_by_token[row['token']], row['status']))
     if any([rank for rank, _ in values] != list(range(len(values))) for values in history.values()):
         raise ValueError('non-contiguous failed candidate history')
 
@@ -84,14 +88,14 @@ def main():
             raise ValueError(f'unexpected lookup filename: {path.name}')
         threshold = parts[1]
         for row in read_csv(path)[1]:
-            key = (row['query_id'], row['mode'], row['threshold'], row['repeat'])
-            candidates[key] = json.loads(row['candidates_json'])
+            candidate_key = lookup_key(row, mode, threshold)
+            candidates[candidate_key] = json.loads(row['candidates_json'])
 
     next_tasks = []
     next_summary = Counter()
     exhausted = Counter()
     for key, attempts in history.items():
-        query_id, mode, threshold, repeat = key
+        _, _, query_id, mode, threshold, repeat = key
         last_status = attempts[-1][1]
         next_rank = len(attempts)
         if last_status not in FAILURES:
