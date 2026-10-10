@@ -16,7 +16,7 @@ def main():
     for name in ['package', 'request', 'server-round', 'client-proofs', 'store', 'session-db',
                  'session-binary', 'work', 'output']:
         p.add_argument('--' + name, type=Path, required=True)
-    p.add_argument('--candidate-round', type=int, choices=[0, 1, 2], required=True)
+    p.add_argument('--candidate-round', type=int, choices=[0, 1, 2, 3], required=True)
     p.add_argument('--confirmations', type=Path)
     args = p.parse_args()
     if args.output.exists() or args.work.exists():
@@ -46,8 +46,8 @@ def main():
             round_manifest.get('candidate_round', 0) != args.candidate_round):
         raise ValueError('server round/request binding mismatch')
     if args.candidate_round > 0:
-        confirmation_key = ('confirmations_rank1_sha256' if args.candidate_round == 2
-                            else 'confirmations_sha256')
+        confirmation_key = (f'confirmations_rank{args.candidate_round - 1}_sha256'
+                            if args.candidate_round > 1 else 'confirmations_sha256')
         if (round_manifest.get(confirmation_key) !=
                 sha(args.confirmations / 'confirmations.csv') or
                 any(r['mode'] != 'all' or r['candidate_rank'] != str(args.candidate_round) for r in challenges)):
@@ -55,8 +55,9 @@ def main():
     challenge_keys = {tuple(r[name] for name in TASK): r['token'] for r in challenges}
     expected_proofs = (Counter({'signed': 6588, 'recovery_failed': 882}) if args.candidate_round == 0
                        else Counter({'signed': 111, 'recovery_failed': 183}) if args.candidate_round == 1
-                       else Counter({'signed': 87, 'recovery_failed': 99}))
-    if ([7470, 294, 186][args.candidate_round] != len(proofs) or
+                       else Counter({'signed': 87, 'recovery_failed': 99}) if args.candidate_round == 2
+                       else Counter({'signed': 105, 'recovery_failed': 66}))
+    if ([7470, 294, 186, 171][args.candidate_round] != len(proofs) or
             len(challenge_keys) != len(challenges) or len(challenges) != len(proofs) or
             len({tuple(r[n] for n in TASK) for r in proofs}) != len(proofs)):
         raise ValueError('proof/challenge coverage mismatch')
@@ -88,7 +89,8 @@ def main():
     receipt_statuses = Counter(r['status'] for r in receipts)
     expected = (Counter({'verified': 6588, 'client_failed': 882}) if args.candidate_round == 0
                 else Counter({'verified': 111, 'client_failed': 183}) if args.candidate_round == 1
-                else Counter({'verified': 87, 'client_failed': 99}))
+                else Counter({'verified': 87, 'client_failed': 99}) if args.candidate_round == 2
+                else Counter({'verified': 105, 'client_failed': 66}))
     if receipt_statuses != expected:
         raise ValueError(f'unexpected receipt statuses: {dict(receipt_statuses)}')
     bundle(receipts_root, 'prefuzzdup-receipts-v1', run, digest, 'receipts.csv',
