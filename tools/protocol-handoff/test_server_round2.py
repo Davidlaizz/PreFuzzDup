@@ -21,6 +21,13 @@ RUN = ROOT / 'handoff-results/prefuzz-full-20261009'
 
 
 class Round2Tests(unittest.TestCase):
+    def test_fourth_candidate_plan(self):
+        tasks, evidence = worker.plan(PACKAGE, REQUEST, RUN, 3)
+        self.assertEqual(len(tasks), 171)
+        self.assertEqual(Counter(r['threshold'] for r in tasks), {'4': 45, '5': 60, '6': 66})
+        self.assertTrue(all(r['candidate_rank'] == '3' and r['mode'] == 'all' for r in tasks))
+        self.assertEqual(len(evidence['prior_tokens']), 7950)
+
     def test_issue_packaging_and_repeat_guard(self):
         self.assertIsNotNone(worker)
         _, evidence = worker.plan(PACKAGE, REQUEST, RUN)

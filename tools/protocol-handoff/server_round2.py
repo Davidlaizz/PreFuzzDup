@@ -26,7 +26,7 @@ def checked_manifest(root, name):
     return m
 
 
-def plan(package, request_path, root):
+def plan(package, request_path, root, target_rank=2):
     verify(package)
     request = json.loads(request_path.read_text())
     run, digest = request['run_id'], sha(package / 'handoff-manifest.json')
@@ -47,9 +47,13 @@ def plan(package, request_path, root):
             if row['query_id'] in truth and truth[row['query_id']] != choices:
                 raise ValueError('repeated lookup differs')
             truth[row['query_id']] = choices
+    if target_rank not in (2, 3):
+        raise ValueError('only round 2 and round 3 are frozen')
     history, evidence, last = {}, {}, []
-    for rank, suffix, challenge_dir in [(0, 'round000-r1', first),
-                                       (1, 'round001', root / 'server-next-round-001')]:
+    rounds = [(0, 'round000-r1', first),
+              (1, 'round001', root / 'server-next-round-001'),
+              (2, 'round002', root / 'server-next-round-002')]
+    for rank, suffix, challenge_dir in rounds[:target_rank]:
         name = 'server-round-manifest.json' if rank == 0 else 'next-round-manifest.json'
         cm = checked_manifest(challenge_dir, name)
         challenge_manifest, challenges = read_bundle(challenge_dir / 'challenges',
@@ -57,7 +61,7 @@ def plan(package, request_path, root):
         if cm['status'] != 'awaiting_client_proofs' or cm['run_id'] != run or cm['package_manifest_sha256'] != digest:
             raise ValueError('challenge manifest binding')
         if rank and challenge_manifest['confirmations_sha256'] != sha(
-                root / 'client-confirmation-round000-r1/public/confirmations.csv'):
+                root / f'client-confirmation-{rounds[rank - 1][1]}/public/confirmations.csv'):
             raise ValueError('failed-prefix manifest mismatch')
         validate_tasks(challenges, run, queries, truth, history)
         proof_root = root / f'client-proof-{suffix}/public'
@@ -98,11 +102,13 @@ def plan(package, request_path, root):
     tasks = []
     for row in last:
         choices = [c for c in truth[row['query_id']] if c[1] <= int(row['threshold'])]
-        if row['mode'] == 'all' and row['status'] in FAILURES and len(choices) > 2:
-            tasks.append({**{n: row[n] for n in TASK}, 'record_id': choices[2][0],
-                          'token': '', 'candidate_rank': '2'})
-    if len(tasks) != 186 or Counter(r['threshold'] for r in tasks) != {'4': 54, '5': 60, '6': 72}:
-        raise ValueError('frozen round-2 coverage differs')
+        if row['mode'] == 'all' and row['status'] in FAILURES and len(choices) > target_rank:
+            tasks.append({**{n: row[n] for n in TASK}, 'record_id': choices[target_rank][0],
+                          'token': '', 'candidate_rank': str(target_rank)})
+    expected = ({2: (186, {'4': 54, '5': 60, '6': 72}),
+                 3: (171, {'4': 45, '5': 60, '6': 66})})[target_rank]
+    if len(tasks) != expected[0] or Counter(r['threshold'] for r in tasks) != expected[1]:
+        raise ValueError('frozen candidate coverage differs')
     evidence.update(prior_rounds_checked=2, run_id=run, package_manifest_sha256=digest,
                     prior_tokens=[h['token'] for hs in history.values() for h in hs])
     return tasks, evidence
@@ -111,14 +117,15 @@ def plan(package, request_path, root):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('stage', choices=['check', 'issue'])
+    parser.add_argument('--candidate-round', type=int, choices=[2, 3], default=2)
     for n in ['package', 'request', 'root']:
         parser.add_argument('--' + n, type=Path, required=True)
     for n in ['store', 'session-db', 'session-binary', 'work', 'output']:
         parser.add_argument('--' + n, type=Path)
     args = parser.parse_args()
-    tasks, evidence = plan(args.package, args.request, args.root)
+    tasks, evidence = plan(args.package, args.request, args.root, args.candidate_round)
     if args.stage == 'check':
-        print(json.dumps({'status': 'passed', 'tasks': len(tasks), 'candidate_rank': 2}))
+        print(json.dumps({'status': 'passed', 'tasks': len(tasks), 'candidate_rank': args.candidate_round}))
         return
     if any(v is None for v in [args.store, args.session_db, args.session_binary, args.work, args.output]):
         raise ValueError('issue requires store/session/binary/work/output')
@@ -157,15 +164,17 @@ def main():
         raise ValueError('invalid issued tokens')
     public = args.output / 'challenges'
     public.mkdir()
-    write_csv(public / 'challenges.csv', CHALLENGE, [{**r, 'candidate_rank': '2'} for r in rows])
+    write_csv(public / 'challenges.csv', CHALLENGE,
+              [{**r, 'candidate_rank': str(args.candidate_round)} for r in rows])
     evidence.pop('prior_tokens')
     bundle(public, 'prefuzzdup-challenges-v1', evidence['run_id'], evidence['package_manifest_sha256'],
-           'challenges.csv', {'confirmations_sha256': evidence['confirmations_rank1_sha256'], 'candidate_round': 2})
-    manifest = dict(evidence, status='awaiting_client_proofs', candidate_round=2,
+           'challenges.csv', {'confirmations_sha256': evidence[f'confirmations_rank{args.candidate_round - 1}_sha256'],
+                              'candidate_round': args.candidate_round})
+    manifest = dict(evidence, status='awaiting_client_proofs', candidate_round=args.candidate_round,
                     next_challenges=len(rows), command=command,
                     files={p.relative_to(args.output).as_posix(): sha(p) for p in args.output.rglob('*') if p.is_file()})
     (args.output / 'next-round-manifest.json').write_text(json.dumps(manifest, indent=2))
-    print('awaiting_client_proofs: 186 challenges, rank=2')
+    print(f'awaiting_client_proofs: {len(rows)} challenges, rank={args.candidate_round}')
 
 
 if __name__ == '__main__':
