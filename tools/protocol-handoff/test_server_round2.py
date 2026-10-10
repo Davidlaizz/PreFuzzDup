@@ -21,6 +21,14 @@ RUN = ROOT / 'handoff-results/prefuzz-full-20261009'
 
 
 class Round2Tests(unittest.TestCase):
+    def test_fifth_candidate_plan(self):
+        tasks, evidence = worker.plan(PACKAGE, REQUEST, RUN, 4)
+        self.assertEqual(len(tasks), 150)
+        self.assertEqual(Counter(r['threshold'] for r in tasks), {'4': 36, '5': 54, '6': 60})
+        self.assertTrue(all(r['candidate_rank'] == '4' and r['mode'] == 'all' for r in tasks))
+        self.assertEqual(len(evidence['prior_tokens']), 8121)
+        self.assertEqual(evidence['prior_rounds_checked'], 4)
+
     def test_fourth_candidate_plan(self):
         tasks, evidence = worker.plan(PACKAGE, REQUEST, RUN, 3)
         self.assertEqual(len(tasks), 171)
@@ -28,9 +36,9 @@ class Round2Tests(unittest.TestCase):
         self.assertTrue(all(r['candidate_rank'] == '3' and r['mode'] == 'all' for r in tasks))
         self.assertEqual(len(evidence['prior_tokens']), 7950)
 
-    def test_issue_packaging_and_repeat_guard(self):
+    def test_issue_packaging_and_repeat_guard(self, rank=2, count=186):
         self.assertIsNotNone(worker)
-        _, evidence = worker.plan(PACKAGE, REQUEST, RUN)
+        _, evidence = worker.plan(PACKAGE, REQUEST, RUN, rank)
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             store = root / 'store'
@@ -44,7 +52,7 @@ class Round2Tests(unittest.TestCase):
                 db.executemany('INSERT INTO protocol_challenges VALUES(?,X\'\',X\'\',X\'\',0,1)',
                                [(bytes.fromhex(t),) for t in evidence['prior_tokens']])
             db.close()
-            argv = ['server_round2.py', 'issue', '--package', str(PACKAGE), '--request', str(REQUEST),
+            argv = ['server_round2.py', 'issue', '--candidate-round', str(rank), '--package', str(PACKAGE), '--request', str(REQUEST),
                     '--root', str(RUN), '--store', os.environ.get('ROUND2_TEST_STORE', str(store)),
                     '--session-db', str(session), '--session-binary', os.environ.get('ROUND2_TEST_BINARY', str(binary)),
                     '--work', str(root / 'work'), '--output', str(root / 'out')]
@@ -66,15 +74,19 @@ class Round2Tests(unittest.TestCase):
             with patch('sys.argv', argv), patch.object(worker.subprocess, 'run', side_effect=issue):
                 worker.main()
             m = worker.checked_manifest(root / 'out', 'next-round-manifest.json')
-            self.assertEqual((m['candidate_round'], m['next_challenges']), (2, 186))
+            self.assertEqual((m['candidate_round'], m['next_challenges']), (rank, count))
+            self.assertEqual(m['prior_rounds_checked'], rank)
             _, rows = worker.read_bundle(root / 'out/challenges', 'prefuzzdup-challenges-v1',
                                          m['run_id'], m['package_manifest_sha256'], 'challenges.csv')
-            self.assertEqual({r['candidate_rank'] for r in rows}, {'2'})
+            self.assertEqual({r['candidate_rank'] for r in rows}, {str(rank)})
             argv[-3], argv[-1] = str(root / 'work2'), str(root / 'out2')
             with patch('sys.argv', argv), patch.object(worker.subprocess, 'run') as call:
                 with self.assertRaisesRegex(ValueError, 'session already advanced'):
                     worker.main()
                 call.assert_not_called()
+
+    def test_fifth_issue_packaging_and_repeat_guard(self):
+        self.test_issue_packaging_and_repeat_guard(4, 150)
 
     def test_frozen_plan_and_failed_prefix(self):
         self.assertIsNotNone(worker, 'validated third-candidate handoff is required')
