@@ -47,13 +47,14 @@ def plan(package, request_path, root, target_rank=2):
             if row['query_id'] in truth and truth[row['query_id']] != choices:
                 raise ValueError('repeated lookup differs')
             truth[row['query_id']] = choices
-    if target_rank not in (2, 3, 4):
-        raise ValueError('only rounds 2 through 4 are frozen')
+    if target_rank not in (2, 3, 4, 5):
+        raise ValueError('only rounds 2 through 5 are frozen')
     history, evidence, last = {}, {}, []
     rounds = [(0, 'round000-r1', first),
               (1, 'round001', root / 'server-next-round-001'),
               (2, 'round002', root / 'server-next-round-002'),
-              (3, 'round003', root / 'server-next-round-003')]
+              (3, 'round003', root / 'server-next-round-003'),
+              (4, 'round004', root / 'server-next-round-004')]
     for rank, suffix, challenge_dir in rounds[:target_rank]:
         name = 'server-round-manifest.json' if rank == 0 else 'next-round-manifest.json'
         cm = checked_manifest(challenge_dir, name)
@@ -108,7 +109,8 @@ def plan(package, request_path, root, target_rank=2):
                           'token': '', 'candidate_rank': str(target_rank)})
     expected = ({2: (186, {'4': 54, '5': 60, '6': 72}),
                  3: (171, {'4': 45, '5': 60, '6': 66}),
-                 4: (150, {'4': 36, '5': 54, '6': 60})})[target_rank]
+                 4: (150, {'4': 36, '5': 54, '6': 60}),
+                 5: (135, {'4': 33, '5': 48, '6': 54})})[target_rank]
     if len(tasks) != expected[0] or Counter(r['threshold'] for r in tasks) != expected[1]:
         raise ValueError('frozen candidate coverage differs')
     evidence.update(prior_rounds_checked=target_rank, run_id=run, package_manifest_sha256=digest,
@@ -119,7 +121,7 @@ def plan(package, request_path, root, target_rank=2):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('stage', choices=['check', 'issue'])
-    parser.add_argument('--candidate-round', type=int, choices=[2, 3, 4], default=2)
+    parser.add_argument('--candidate-round', type=int, choices=[2, 3, 4, 5], default=2)
     for n in ['package', 'request', 'root']:
         parser.add_argument('--' + n, type=Path, required=True)
     for n in ['store', 'session-db', 'session-binary', 'work', 'output']:

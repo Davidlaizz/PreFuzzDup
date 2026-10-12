@@ -21,6 +21,14 @@ RUN = ROOT / 'handoff-results/prefuzz-full-20261009'
 
 
 class Round2Tests(unittest.TestCase):
+    def test_sixth_candidate_plan(self):
+        tasks, evidence = worker.plan(PACKAGE, REQUEST, RUN, 5)
+        self.assertEqual(len(tasks), 135)
+        self.assertEqual(Counter(r['threshold'] for r in tasks), {'4': 33, '5': 48, '6': 54})
+        self.assertTrue(all(r['candidate_rank'] == '5' and r['mode'] == 'all' for r in tasks))
+        self.assertEqual(len(evidence['prior_tokens']), 8271)
+        self.assertEqual(evidence['prior_rounds_checked'], 5)
+
     def test_fifth_candidate_plan(self):
         tasks, evidence = worker.plan(PACKAGE, REQUEST, RUN, 4)
         self.assertEqual(len(tasks), 150)
@@ -87,6 +95,9 @@ class Round2Tests(unittest.TestCase):
 
     def test_fifth_issue_packaging_and_repeat_guard(self):
         self.test_issue_packaging_and_repeat_guard(4, 150)
+
+    def test_sixth_issue_packaging_and_repeat_guard(self):
+        self.test_issue_packaging_and_repeat_guard(5, 135)
 
     def test_frozen_plan_and_failed_prefix(self):
         self.assertIsNotNone(worker, 'validated third-candidate handoff is required')
